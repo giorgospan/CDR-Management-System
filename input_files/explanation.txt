@@ -1,0 +1,6 @@
+type	tarrif	cost
+0	0	0.1 (fixed)		#  SMS - fixed price
+1	1	0.5 (per minute)	#  Voice Call Domestic
+1	2	1 (per minute)		#  Voice Call Int. 
+2	1	0.2 (per minute)	#  Data Call Domestic
+2	2	0.5 (per minute)	#  Data Call Int.

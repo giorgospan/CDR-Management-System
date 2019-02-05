@@ -1,39 +1,43 @@
 # directories
-OBJDIR := ./obj
-INCDIR := ./include
-SRCDIR := ./src
-BINDIR := ./bin
+OBJDIR   := ./obj
+INCDIR   := ./include
+SRCDIR   := ./src
+BUILDDIR := ./build
 
 # name of executable
-TARGET := werhauz
+TARGET   := werhauz
 
 # specify source,object,header files
 SOURCES  := $(wildcard $(SRCDIR)/*.c)
-OBJECTS  := $(SOURCES:$(SRCDIR)/%.c =$(OBJDIR)/%.o)
+OBJECTS  := $(SOURCES:$(SRCDIR)/%.c=$(OBJDIR)/%.o)
 INCLUDES := $(wildcard $(INCDIR)/*.h)
 
 CC       := gcc
-CFLAGS   := -O3 -g -I $(INCDIR) # -O3 enables further optimization
+CFLAGS   := -O3 -I $(INCDIR) # -O3 enables further optimization
 
-# all
-all: $(BINDIR)/$(TARGET)
+all: $(BUILDDIR)/$(TARGET)
 
-
-# create executable [by linking object files ]
-$(BINDIR)/$(TARGET): $(OBJECTS)
+# create executable [by linking object files]
+# $(BUILDDIR) is an order-only-prerequisite
+$(BUILDDIR)/$(TARGET): $(OBJECTS)  | $(BUILDDIR)
 	$(CC) $(CFLAGS) -o $@ $(OBJECTS)
 
+$(BUILDDIR):
+	mkdir $@
 
 # create object files
-$(OBJECTS): $(OBJDIR)/%.o : $(SRCDIR)/%.c
+# $(OBJDIR) is an order-only-prerequisite
+$(OBJECTS): $(OBJDIR)/%.o : $(SRCDIR)/%.c | $(OBJDIR)
 	$(CC) $(CFLAGS) -c $< -o $@
 
+$(OBJDIR):
+	mkdir $@
 
-# cleanup object files from previous compilations
+# cleanup binary files
 .PHONY: clean
 clean:
-	@rm -f $(OBJECTS) $(BINDIR)/$(TARGET)
-	echo "Cleanup complete!"
+	@rm -f $(OBJECTS) $(BUILDDIR)/$(TARGET)
+	@echo "Cleanup complete!"
 
 # count
 .PHONY: count

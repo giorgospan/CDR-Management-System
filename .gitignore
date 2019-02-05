@@ -1,2 +1,5 @@
 # ingore all files inside obj directory
 obj/
+
+# ingore all files inside bin directory
+bin/
