@@ -1,7 +1,7 @@
 #ifndef AUXQUEUE_H
 #define AUXQUEUE_H
 
-/*Circular Dependency between Heap.h and AuxQueue.h*/
+/*Circular Dependency between heap.h and auxqueue.h*/
 struct Heap ;
 
 #include "heap.h"

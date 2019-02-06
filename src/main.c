@@ -3,7 +3,7 @@
 #include <string.h>
 
 
-// #include "HashTable.h"
+#include "hashtable.h"
 #include "heap.h"
 #include "parser.h"
 
