@@ -9,7 +9,7 @@
 
 void AuxQueueCreate(struct AuxQueue** queue)
 {
-	
+
 	*queue=malloc(sizeof(struct AuxQueue));
 	(*queue)->front=(*queue)->rear=NULL;
 }
@@ -21,15 +21,15 @@ int AuxQueueIsEmpty(struct AuxQueue* queue)
 
 void AuxEnqueue(struct AuxQueue* queue,char* caller,float bill,float percent)
 {
-	
+
 	struct AuxQueueNode* temp = malloc(sizeof(struct AuxQueueNode));
-		
+
 	temp->data.bill = bill;
 	temp->data.percent=percent;
 	temp->data.caller=malloc((strlen(caller)+1)*sizeof(char));
 	strcpy(temp->data.caller,caller);
 	temp->next = NULL;
-	
+
 	if(queue->front == NULL && queue->rear == NULL)
 	{
 		queue->front = queue->rear = temp;
@@ -48,7 +48,7 @@ void ReInsert(struct AuxQueue* queue,struct Heap* heap)
 	{
 		HeapInsert(heap,current->data.caller,current->data.bill);
 		current=current->next;
-		Dequeue(queue);
+		AuxDequeue(queue);
 	}
 }
 
@@ -64,7 +64,7 @@ void AuxDequeue(struct AuxQueue* queue)
 	{
 		queue->front = queue->rear = NULL;
 	}
-	else 
+	else
 	{
 		queue->front = queue->front->next;
 	}
@@ -76,7 +76,7 @@ void AuxQueueDestroy(struct AuxQueue* queue)
 {
 	struct AuxQueueNode* current;
 	struct AuxQueueNode* temp;
-	
+
 	current=queue->front;
 	while(current)
 	{
@@ -88,13 +88,12 @@ void AuxQueueDestroy(struct AuxQueue* queue)
 	free(queue);
 }
 
-
-void PrintAuxQueue(struct AuxQueue* queue) 
+void PrintAuxQueue(struct AuxQueue* queue)
 {
 	float s=0;
 	printf("Subscribers:\n");
 	struct AuxQueueNode* temp = queue->front;
-	while(temp != NULL) 
+	while(temp != NULL)
 	{
 		printf("%s: ",temp->data.caller);
 		printf("%.2f euros\t| ",temp->data.bill);

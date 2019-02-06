@@ -5,7 +5,7 @@
 #include "linkedlist.h"
 #include "misc.h"
 #include "bucket.h"
-#include "parser.h" /*for read_time_range()*/
+#include "parser.h" /*for parse_time_range()*/
 
 
 
@@ -109,7 +109,7 @@ int ListFind(struct List* list,char* caller,char* time_range,int tabletype)
 	struct tm from_date;
 	struct tm to_date;
 	printf("Time Range:\n");
-	read_time_range(time_range,&from_date,&to_date ,&flag);
+	parse_time_range(time_range,&from_date,&to_date ,&flag);
 	printf("\n");
 
 
@@ -140,7 +140,7 @@ int ListLookUp(struct List* list,char* callee,char* time_range,int tabletype)
 	struct tm from_date;
 	struct tm to_date;
 	printf("Time Range:\n");
-	read_time_range(time_range,&from_date,&to_date ,&flag);
+	parse_time_range(time_range,&from_date,&to_date ,&flag);
 	printf("\n");
 
 

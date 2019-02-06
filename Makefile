@@ -13,7 +13,7 @@ OBJECTS  := $(SOURCES:$(SRCDIR)/%.c=$(OBJDIR)/%.o)
 INCLUDES := $(wildcard $(INCDIR)/*.h)
 
 CC       := gcc
-CFLAGS   := -O3 -I $(INCDIR) # -O3 enables further optimization
+CFLAGS   := -I $(INCDIR) # -O3 enables further optimization
 
 all: $(BUILDDIR)/$(TARGET)
 

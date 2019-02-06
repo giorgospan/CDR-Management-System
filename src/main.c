@@ -53,7 +53,6 @@ int main(int argc,char* argv[])
 
 	if(!ht1_provided && !ht2_provided && !bsize_provided)
 	{
-		printf("Not enough arguments given\nExiting...\n\n");
 		fprintf(stderr, "Usage:./werhauz -o Operations -h1 Hashtable1NumOfEntries -h2 Hashtable2NumOfEntries -s bucket_size -c config-file\n\n");
 		exit(EXIT_FAILURE);
 	}
