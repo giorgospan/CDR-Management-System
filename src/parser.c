@@ -61,11 +61,16 @@ void parse_delete(FILE* fp,struct HashTable* CallerTable)
 {
 	char* caller_num = malloc(50 * sizeof(char));
 	char* cdr_id     = malloc(50 * sizeof(char));
-	fscanf(fp,"%49s %49s",caller_num,cdr_id);
+	/**
+	 * White space is essential for avoiding storing
+	 * newline from previous input when reading from prompt
+	 */
+	fscanf(fp," %49[^;];",cdr_id);
+	fscanf(fp,"%49s",caller_num);
 
-	printf("----------------------------------------------\n");
-	printf("Delete cdr %s of number %s\n",cdr_id,caller_num);
-	printf("----------------------------------------------\n\n");
+	printf("------------------------------------------------\n");
+	printf("Delete cdr %s with caller %s\n",cdr_id,caller_num);
+	printf("------------------------------------------------\n\n");
 	TableDelete(CallerTable,caller_num,cdr_id);
 	printf("\n");
 	free(cdr_id);
@@ -219,7 +224,7 @@ void parse_opfile(FILE* fp,char* confile,struct HashTable** CallerTable,struct H
 			if(!(fpconfig=fopen(confile,"r")))
 			{
 				printf("Error with opening config file.Exiting...\n");
-				exit(1);
+				exit(EXIT_FAILURE);
 			}
 			parse_insert(fp,fpconfig,*CallerTable,*CalleeTable,*heap);
 			fclose(fpconfig);
@@ -296,7 +301,7 @@ void parse_prompt(char* confile,struct HashTable** CallerTable,struct HashTable*
 			"9.Print\n"
 			"10.Dump\n\n");
 
-		scanf("%d",&choice);
+		scanf(" %d",&choice);
 		switch(choice)
 		{
 			case 0:
@@ -306,16 +311,16 @@ void parse_prompt(char* confile,struct HashTable** CallerTable,struct HashTable*
 				if(!(fpconfig=fopen(confile,"r")))
 				{
 					printf("Error with opening config file.Exiting...\n");
-					exit(1);
+					exit(EXIT_FAILURE);
 				}
 				printf("Enter the number of CDRs you would like to insert\n");
 				scanf("%d",&inserts);
-				printf("Enter CDR unique ID,caller's number,callee number,date,time,duration,type,tarrif,fault condition\n");
+				printf("Enter CDR_unique_ID;caller_num;callee_num;date;time;duration;type;tarrif;fault_cond\n");
 				for(i=0;i<inserts;++i)parse_insert(stdin,fpconfig,*CallerTable,*CalleeTable,*heap);
 				fclose(fpconfig);
 				break;
 			case 2:
-				printf("Enter CDR unique ID,caller's number seperated by space\n");
+				printf("Enter CDR unique ID and caller's number seperated by semicolon\n");
 				parse_delete(stdin,*CallerTable);
 				break;
 			case 3:
@@ -350,12 +355,42 @@ void parse_prompt(char* confile,struct HashTable** CallerTable,struct HashTable*
 				parse_dump(stdin,*CallerTable,*CalleeTable);
 				break;
 			default:
-				printf("Error: Your choice was not valid.Try again !\n");
-				/* Collecting garbage from stdin*/
-				scanf("%s",trash);
+				printf(">>>Error: Your choice was not valid.Try again<<<\n\n");
+				/* Collecting garbage(i.e: invalid input) from stdin*/
+				if(choice==EOF)
+					scanf("%s",trash);
 				break;
 		}
 	}
+}
+
+double parse_confile(FILE* fpconfig,int type,int tarrif,int duration)
+{
+	int typ,tarr;
+	float cost;
+
+	/*SMS: standard charge*/
+	if(type==0 && tarrif==0)return 0.1;
+
+	/*Otherwise*/
+	char* line = malloc(200*sizeof(char));
+	while(fgets(line,200,fpconfig)!=NULL)
+	{
+
+		if(line[0]=='#')continue;/*comment*/
+		else
+		{
+			sscanf(line,"%d;%d;%f",&typ,&tarr,&cost);
+			if(typ==type && tarrif==tarr)
+			{
+				free(line);
+				return duration * cost;
+			}
+		}
+	}
+	free(line);
+	/* (Type,Tarrif) combination was not found*/
+	return 0;
 }
 
 void parse_time_range(char* buffer, struct tm* from_date,struct tm* to_date ,int*flag)
@@ -433,34 +468,4 @@ void parse_time_range(char* buffer, struct tm* from_date,struct tm* to_date ,int
 	}
 	free(temp);
 
-}
-
-
-double parse_confile(FILE* fpconfig,int type,int tarrif,int duration)
-{
-	int typ,tarr;
-	float cost;
-
-	/*SMS: standard charge*/
-	if(type==0 && tarrif==0)return 0.1;
-
-	/*Otherwise*/
-	char* line = malloc(200*sizeof(char));
-	while(fgets(line,200,fpconfig)!=NULL)
-	{
-
-		if(line[0]=='#')continue;/*comment*/
-		else
-		{
-			sscanf(line,"%d;%d;%f",&typ,&tarr,&cost);
-			if(typ==type && tarrif==tarr)
-			{
-				free(line);
-				return duration * cost;
-			}
-		}
-	}
-	free(line);
-	/* (Type,Tarrif) combination was not found*/
-	return 0;
 }

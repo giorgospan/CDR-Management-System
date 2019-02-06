@@ -8,8 +8,6 @@
 #include "parser.h" /*for parse_time_range()*/
 
 
-
-
 void CreateList(struct List** list,int bsize,int t)
 {
 	*list         = malloc(sizeof(struct List));
@@ -35,7 +33,6 @@ void CreateList(struct List** list,int bsize,int t)
 	}
 }
 
-
 void ListAddNode(struct List* list)
 {
 	struct ListNode *node = malloc(sizeof(struct ListNode));
@@ -54,7 +51,6 @@ void ListAddNode(struct List* list)
 	/*First available slot :  First slot of the newly created bucket */
 	list->available_slot = node->bucket;
 }
-
 
 void ListInsert(struct List* list,struct CDR* cdr)
 {
@@ -196,7 +192,6 @@ void ListPrint(struct List* list,char* hash_key,int tabletype)
 	}
 }
 
-
 void ListDeleteNode(struct List* list,struct ListNode* prev,struct ListNode* node)
 {
 	/*Deleting head of the list*/
@@ -258,7 +253,6 @@ int ListDelete(struct List* list,char* caller,char* cdr_id)
 	}
 	return 0;
 }
-
 
 void ListDump(struct List* list,int tabletype,FILE* fp,char* hash_key)
 {
@@ -356,7 +350,6 @@ void ListDestroy(struct List* list)
 	}
 	free(list);
 }
-
 
 struct CDRBucket* search_cdr(struct List* list,char* id,struct ListNode** previous)
 {

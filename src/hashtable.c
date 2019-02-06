@@ -46,26 +46,26 @@ int HashFunction(struct HashTable* HTPtr,char* number)
 void TableInsert(struct HashTable* HTPtr,struct CDR* cdr)
 {
 	int i;
-	int index;
+	int hashval;
 	char* number;
 
 
-	number = malloc((strlen(cdr->hash_key)+1)*sizeof(char));
+	number  = malloc((strlen(cdr->hash_key)+1)*sizeof(char));
 	strcpy(number,cdr->hash_key);
-	index = HashFunction(HTPtr,number);
+	hashval = HashFunction(HTPtr,number);
 	free(number);
 
-	ListInsert((HTPtr->table)[index],cdr);
+	ListInsert((HTPtr->table)[hashval],cdr);
 	++HTPtr->records;
 }
 
 void TableDelete(struct HashTable* HTPtr,char* caller,char* cdr_id)
 {
-	int index;
-	int deleted=0;
+	int hashval;
+	int deleted = 0;
 
-	index = HashFunction(HTPtr,caller);
-	deleted = ListDelete(HTPtr->table[index],caller,cdr_id);
+	hashval = HashFunction(HTPtr,caller);
+	deleted = ListDelete(HTPtr->table[hashval],caller,cdr_id);
 
 	if(deleted)
 	{
@@ -77,10 +77,10 @@ void TableDelete(struct HashTable* HTPtr,char* caller,char* cdr_id)
 
 void TableFind(struct HashTable* HTPtr,char* caller,char* time_range)
 {
-	int index;
+	int hashval;
 	int found;
-	index = HashFunction(HTPtr,caller);
-	found = ListFind((HTPtr->table)[index],caller,time_range,HTPtr->type);
+	hashval = HashFunction(HTPtr,caller);
+	found   = ListFind((HTPtr->table)[hashval],caller,time_range,HTPtr->type);
 	if(!found)
 	{
 		printf("Caller %s could not be found\n",caller);
@@ -89,10 +89,10 @@ void TableFind(struct HashTable* HTPtr,char* caller,char* time_range)
 
 void TableLookUp(struct HashTable* HTPtr,char* callee,char* time_range)
 {
-	int index;
+	int hashval;
 	int found;
-	index = HashFunction(HTPtr,callee);
-	found = ListLookUp((HTPtr->table)[index],callee,time_range,HTPtr->type);
+	hashval = HashFunction(HTPtr,callee);
+	found   = ListLookUp((HTPtr->table)[hashval],callee,time_range,HTPtr->type);
 	if(!found)
 	{
 		printf("Callee with number %s could not be found\n",callee);
@@ -101,10 +101,10 @@ void TableLookUp(struct HashTable* HTPtr,char* callee,char* time_range)
 
 void TableTopDest(struct HashTable* HTPtr,char* caller)
 {
-	int index;
+	int hashval;
 	int found;
-	index = HashFunction(HTPtr,caller);
-	found = ListTopDest((HTPtr->table)[index],caller);
+	hashval = HashFunction(HTPtr,caller);
+	found = ListTopDest((HTPtr->table)[hashval],caller);
 	if(!found)
 	{
 		printf("Caller with number %s could not be found\n",caller);
@@ -161,7 +161,7 @@ void TableDestroy(struct HashTable* HTPtr)
 // void TableIndist(struct HashTable* HTPtr,char* caller1,char* caller2)
 // {
 
-	// int index;
+	// int hashval;
 	// int i;
 	// int counter;
 	// struct auxiliary_struct* aux=malloc(sizeof(struct auxiliary_struct));
