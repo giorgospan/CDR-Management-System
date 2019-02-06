@@ -6,7 +6,7 @@
 #include "parser.h"
 // #include "Misc.h"
 // #include "HashTable.h"
-// #include "heap.h"
+#include "heap.h"
 
 void parse_insert(FILE* fp,FILE* fpconfig,struct HashTable* CallerTable,struct HashTable* CalleeTable,struct Heap* heap)
 {
@@ -40,21 +40,22 @@ void parse_insert(FILE* fp,FILE* fpconfig,struct HashTable* CallerTable,struct H
 	/*Checking if fault condition of type "2XX" */
 	if(record.fault_condition>=200 && record.fault_condition<=299)
 	{
-		charge=compute_billing(fpconfig,record.type,record.tarrif,record.duration);
-		// HeapInsert(heap,record.hash_key,charge);
+		if(fpconfig != NULL)
+			charge = parse_confile(fpconfig,record.type,record.tarrif,record.duration);
+		else
+			charge = 0.1;
+		HeapInsert(heap,record.hash_key,charge);
 	}
 
 	strcpy(record.hash_key,callee_number);
 	strcpy(record.other_number,caller_number);
-	TableInsert(CalleeTable,&record);
+	// TableInsert(CalleeTable,&record);
 
 	free(record.cdr_uniq_id);
 	free(record.hash_key);
 	free(record.other_number);
 	free(caller_number);
 	free(callee_number);
-
-
 }
 
 void parse_delete(FILE* fp,struct HashTable* CallerTable)
@@ -154,12 +155,12 @@ void parse_bye(FILE* fp,struct HashTable** CallerTable,struct HashTable** Callee
 	printf("New ones will be created automatically\n");
 	printf("--------------------------------------\n\n");
 
-	TableDestroy(*CallerTable);
-	TableDestroy(*CalleeTable);
+	// TableDestroy(*CallerTable);
+	// TableDestroy(*CalleeTable);
 	HeapDestroy(*heap);
 
-	CreateTable(CallerTable,HTSize1,1,BucketSize);
-	CreateTable(CalleeTable,HTSize2,2,BucketSize);
+	// CreateTable(CallerTable,HTSize1,1,BucketSize);
+	// CreateTable(CalleeTable,HTSize2,2,BucketSize);
 	HeapCreate(heap);
 }
 
@@ -202,7 +203,6 @@ void parse_dump(FILE* fp,struct HashTable* CallerTable,struct HashTable* CalleeT
 
 void parse_opfile(FILE* fp,char* confile,struct HashTable** CallerTable,struct HashTable** CalleeTable,struct Heap** heap)
 {
-
 
 	char* operation = malloc(50*sizeof(char));
 
@@ -436,7 +436,7 @@ void parse_time_range(char* buffer, struct tm* from_date,struct tm* to_date ,int
 }
 
 
-double compute_billing(FILE* fpconfig,int type,int tarrif,int duration)
+double parse_confile(FILE* fpconfig,int type,int tarrif,int duration)
 {
 	char* line = malloc(200*sizeof(char));
 	int typ,tarr;

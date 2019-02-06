@@ -2,7 +2,7 @@
 #define PARSER_H
 
 #include <time.h>
-// #include "heap.h"
+#include "heap.h"
 // #include "HashTable.h"
 
 extern int ht1_size;
@@ -32,6 +32,6 @@ void parse_dump(FILE*,struct HashTable*,struct HashTable*);
 void parse_time_range(char*,struct tm*,struct tm*,int*);
 
 /* Computes charge for every call according to configuration file */
-double compute_billing(FILE*,int,int,int);
+double parse_confile(FILE*,int,int,int);
 
 #endif

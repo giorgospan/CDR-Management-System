@@ -4,7 +4,7 @@
 
 
 // #include "HashTable.h"
-// #include "heap.h"
+#include "heap.h"
 #include "parser.h"
 
 int ht1_size;
@@ -15,12 +15,11 @@ int bucket_size;
 int main(int argc,char* argv[])
 {
 	int i;
-	int ht1_provided=0;
-	int ht2_provided=0;
-	int bsize_provided=0;
-
-	char* opfile=NULL;
-	char* confile=NULL;
+	int ht1_provided   = 0;
+	int ht2_provided   = 0;
+	int bsize_provided = 0;
+	char* opfile       = NULL;
+	char* confile      = NULL;
 
 	/* Scan command line arguments */
 	for(i=0;i<argc;++i)
@@ -67,35 +66,35 @@ int main(int argc,char* argv[])
 /********************************************************************************************/
 
 	/* Create Structures */
-	// struct HashTable* caller_table;
-	// struct HashTable* callee_table;
-	// struct Heap* heap;
+	struct HashTable* caller_table;
+	struct HashTable* callee_table;
+	struct Heap* heap;
 	// CreateTable(&caller_table,ht1_size,1,bucket_size);
 	// CreateTable(&callee_table,ht2_size,2,bucket_size);
-	// HeapCreate(&heap);
-  //
-	// /* Read Operations File(if provided) */
-	// if(opfile!=NULL)
-	// {
-	// 	FILE* fp;
-	// 	if(!(fp=fopen(opfile,"r")))
-	// 	{
-	// 		fprintf(stderr,"Error with opening Operation File %s \n",opfile);
-	// 	}
-	// 	else
-	// 	{
-	// 		parse_opfile(fp,confile,&caller_table,&callee_table,&heap);
-	// 		fclose(fp);
-	// 		free(opfile);
-	// 	}
-	// }
-	// /* Read via prompt */
-	// parse_prompt(confile,&caller_table,&callee_table,&heap);
-  //
-	// if(confile)free(confile);
+	HeapCreate(&heap);
+
+	/* Read Operations File(if provided) */
+	if(opfile!=NULL)
+	{
+		FILE* fp;
+		if(!(fp=fopen(opfile,"r")))
+		{
+			fprintf(stderr,"Error with opening Operation File %s \n",opfile);
+		}
+		else
+		{
+			parse_opfile(fp,confile,&caller_table,&callee_table,&heap);
+			fclose(fp);
+			free(opfile);
+		}
+	}
+	/* Read via prompt */
+	parse_prompt(confile,&caller_table,&callee_table,&heap);
+
+	if(confile)free(confile);
 	// TableDestroy(caller_table);
 	// TableDestroy(callee_table);
-	// HeapDestroy(heap);
-	// return 0;
+	HeapDestroy(heap);
+	return 0;
 
 }
