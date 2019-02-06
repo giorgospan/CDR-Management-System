@@ -25,11 +25,11 @@ void CreateTable(struct HashTable** HTPtrPtr, int HTSize,int HTType,int bsize)
 		CreateList((*HTPtrPtr) -> table+i,bsize,1);
 	}
 
-	printf("HT has been created\n");
-	if(HTType==1)printf("Type:Caller's\n");
-	else printf("Callee's\n");
-	printf("Size:%d\n",HTSize);
-	printf("---------------------\n\n");
+	// printf("HT has been created\n");
+	// if(HTType==1)printf("Type:Caller's\n");
+	// else printf("Callee's\n");
+	// printf("Size:%d\n",HTSize);
+	// printf("---------------------\n\n");
 }
 
 int HashFunction(struct HashTable* HTPtr,char* number)
@@ -139,12 +139,18 @@ void TableDestroy(struct HashTable* HTPtr)
 	/*Destroying each list of the table*/
 	for(i=0;i<HTPtr->size;++i)ListDestroy(HTPtr->table[i]);
 
+	printf("---------------------\n");
 	printf("HT has been destroyed\n");
-	if(HTPtr->type==1)printf("Type:Caller's\n");
-	else printf("Callee's\n");
-	printf("Size:%d\n",HTPtr->size);
-	printf("Records:%d\n",HTPtr->records);
+
+	if(HTPtr->type==1)
+	printf("Type   : Caller's\n");
+	else
+	printf("Type   : Callee's\n");
+
+	printf("Size   : %d\n",HTPtr->size);
+	printf("Records: %d\n",HTPtr->records);
 	printf("---------------------\n\n");
+	free(HTPtr->table);
 	free(HTPtr);
 }
 

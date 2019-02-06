@@ -19,7 +19,11 @@ void parse_insert(FILE* fp,FILE* fpconfig,struct HashTable* CallerTable,struct H
 	char* caller_number = malloc(50 * sizeof(char));
 	char* callee_number = malloc(50 * sizeof(char));
 
-	fscanf(fp,"%49[^;] ;",record.cdr_uniq_id);
+	/**
+	 * White space is essential for avoiding storing
+	 * newline from previous input when reading from prompt
+	 */
+	fscanf(fp," %49[^;] ;",record.cdr_uniq_id);
 	fscanf(fp,"%49[^;] ;",caller_number);
 	fscanf(fp,"%49[^;] ;",callee_number);
 	fscanf(fp,"%2d %2d %4d ;",&record.date.tm_mday,&record.date.tm_mon,&record.date.tm_year);
@@ -29,10 +33,6 @@ void parse_insert(FILE* fp,FILE* fpconfig,struct HashTable* CallerTable,struct H
 	record.date.tm_year-=1900;
 	record.date.tm_sec=0;
 
-	/*When reading from stdin a newline is always attached at the first character of cdr_uniq_id*/
-	if(fp==stdin)strcpy(record.cdr_uniq_id,&record.cdr_uniq_id[1]);
-
-
 	strcpy(record.hash_key,caller_number);
 	strcpy(record.other_number,callee_number);
 	TableInsert(CallerTable,&record);
@@ -40,7 +40,7 @@ void parse_insert(FILE* fp,FILE* fpconfig,struct HashTable* CallerTable,struct H
 	/*Checking if fault condition of type "2XX" */
 	if(record.fault_condition>=200 && record.fault_condition<=299)
 	{
-		charge=compute_billing(fpconfig,record.type,record.tarrif,record.duration);
+		charge=parse_confile(fpconfig,record.type,record.tarrif,record.duration);
 		HeapInsert(heap,record.hash_key,charge);
 	}
 
@@ -280,7 +280,8 @@ void parse_prompt(char* confile,struct HashTable** CallerTable,struct HashTable*
 
 	while(choice != 0)
 	{
-		printf("Select an operation :\n");
+		printf("---------------------\n");
+		printf("Select an operation  \n");
 		printf("---------------------\n");
 
 		printf(	"0.Exit\n"
@@ -338,7 +339,6 @@ void parse_prompt(char* confile,struct HashTable** CallerTable,struct HashTable*
 				parse_top(stdin,*CallerTable,*CalleeTable,*heap);
 				break;
 			case 8:
-				printf("All data structures will be destroyed\nNew ones will be created automatically\n\n");
 				parse_bye(stdin,CallerTable,CalleeTable,heap);
 				break;
 			case 9:
@@ -436,14 +436,16 @@ void parse_time_range(char* buffer, struct tm* from_date,struct tm* to_date ,int
 }
 
 
-double compute_billing(FILE* fpconfig,int type,int tarrif,int duration)
+double parse_confile(FILE* fpconfig,int type,int tarrif,int duration)
 {
-	char* line = malloc(200*sizeof(char));
 	int typ,tarr;
 	float cost;
 
 	/*SMS: standard charge*/
 	if(type==0 && tarrif==0)return 0.1;
+
+	/*Otherwise*/
+	char* line = malloc(200*sizeof(char));
 	while(fgets(line,200,fpconfig)!=NULL)
 	{
 
@@ -451,7 +453,11 @@ double compute_billing(FILE* fpconfig,int type,int tarrif,int duration)
 		else
 		{
 			sscanf(line,"%d;%d;%f",&typ,&tarr,&cost);
-			if(typ==type && tarrif==tarr)return duration * cost;
+			if(typ==type && tarrif==tarr)
+			{
+				free(line);
+				return duration * cost;
+			}
 		}
 	}
 	free(line);

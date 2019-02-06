@@ -26,7 +26,7 @@ int main(int argc,char* argv[])
 	{
 		if(!strcmp("-o",argv[i]))
 		{
-			opfile = malloc((strlen(argv[i+1]+1))* sizeof(char));
+			opfile = malloc((strlen(argv[i+1])+1)* sizeof(char));
 			strcpy(opfile,argv[i+1]);
 		}
 		else if(!strcmp("-h1",argv[i]))
@@ -46,7 +46,7 @@ int main(int argc,char* argv[])
 		}
 		else if(!strcmp("-c",argv[i]))
 		{
-			confile = malloc((strlen(argv[i+1]+1))* sizeof(char));
+			confile = malloc((strlen(argv[i+1])+1)* sizeof(char));
 			strcpy(confile,argv[i+1]);
 		}
 	}
@@ -58,9 +58,9 @@ int main(int argc,char* argv[])
 	}
 
 
-	printf("Caller's hashtable:%d entries\n",ht1_size);
-	printf("Callee's hashtable:%d entries\n",ht2_size);
-	printf("bucket_size:%d bytes\n",bucket_size);
+	printf("Caller's hashtable : %d entries\n",ht1_size);
+	printf("Callee's hashtable : %d entries\n",ht2_size);
+	printf("Bucket's size      : %d bytes\n",bucket_size);
 	printf("\n\n");
 /********************************************************************************************/
 
@@ -68,8 +68,8 @@ int main(int argc,char* argv[])
 	struct HashTable* caller_table;
 	struct HashTable* callee_table;
 	struct Heap* heap;
-	// CreateTable(&caller_table,ht1_size,1,bucket_size);
-	// CreateTable(&callee_table,ht2_size,2,bucket_size);
+	CreateTable(&caller_table,ht1_size,1,bucket_size);
+	CreateTable(&callee_table,ht2_size,2,bucket_size);
 	HeapCreate(&heap);
 
 	/* Read Operations File(if provided) */
@@ -78,21 +78,21 @@ int main(int argc,char* argv[])
 		FILE* fp;
 		if(!(fp=fopen(opfile,"r")))
 		{
-			fprintf(stderr,"Error with opening Operation File %s \n",opfile);
+			fprintf(stderr,">> Error with opening Operation File \"%s\" << \n\n",opfile);
 		}
 		else
 		{
 			parse_opfile(fp,confile,&caller_table,&callee_table,&heap);
 			fclose(fp);
-			free(opfile);
 		}
 	}
 	/* Read via prompt */
 	parse_prompt(confile,&caller_table,&callee_table,&heap);
 
-	if(confile)free(confile);
-	// TableDestroy(caller_table);
-	// TableDestroy(callee_table);
+	free(opfile);
+	free(confile);
+	TableDestroy(caller_table);
+	TableDestroy(callee_table);
 	HeapDestroy(heap);
 	return 0;
 

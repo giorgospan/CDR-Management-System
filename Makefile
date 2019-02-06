@@ -13,9 +13,16 @@ OBJECTS  := $(SOURCES:$(SRCDIR)/%.c=$(OBJDIR)/%.o)
 INCLUDES := $(wildcard $(INCDIR)/*.h)
 
 CC       := gcc
-CFLAGS   := -I $(INCDIR) # -O3 enables further optimization
+CFLAGS   := -g -I$(INCDIR)
 
-all: $(BUILDDIR)/$(TARGET)
+
+all:clean $(BUILDDIR)/$(TARGET)
+
+valgrind:clean $(BUILDDIR)/$(TARGET)
+	valgrind --leak-check=full --track-origins=yes --show-leak-kinds=all $(BUILDDIR)/$(TARGET) -h1 10 -h2 10 -s 1024 -o ./input_files/input11.txt -c ./input_files/config_file.txt
+
+run:clean $(BUILDDIR)/$(TARGET)
+	$(BUILDDIR)/$(TARGET) -h1 10 -h2 10 -s 1024 -o ./input_files/input11.txt -c ./input_files/config_file.txt
 
 # create executable [by linking object files]
 # $(BUILDDIR) is an order-only-prerequisite

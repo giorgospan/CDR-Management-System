@@ -101,5 +101,5 @@ void PrintAuxQueue(struct AuxQueue* queue)
 		s+=temp->data.percent;
 		temp = temp->next;
 	}
-	printf("Total percent:\t\t\t|%.2f %%\n",s);
+	printf("Total percent:\t\t\t| %.2f %%\n",s);
 }
