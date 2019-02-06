@@ -4,8 +4,8 @@
 
 
 // #include "HashTable.h"
-// #include "Heap.h"
-// #include "Input.h"
+// #include "heap.h"
+#include "parser.h"
 
 int ht1_size;
 int ht2_size;
@@ -84,13 +84,13 @@ int main(int argc,char* argv[])
 	// 	}
 	// 	else
 	// 	{
-	// 		read_opfile(fp,confile,&caller_table,&callee_table,&heap);
+	// 		parse_opfile(fp,confile,&caller_table,&callee_table,&heap);
 	// 		fclose(fp);
 	// 		free(opfile);
 	// 	}
 	// }
 	// /* Read via prompt */
-	// read_prompt(confile,&caller_table,&callee_table,&heap);
+	// parse_prompt(confile,&caller_table,&callee_table,&heap);
   //
 	// if(confile)free(confile);
 	// TableDestroy(caller_table);

@@ -2,4 +2,4 @@
 obj/
 
 # ingore all files inside bin directory
-bin/
+build/
