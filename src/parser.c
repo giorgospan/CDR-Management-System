@@ -118,6 +118,7 @@ void parse_indist(FILE* fp,struct HashTable* CallerTable,struct HashTable* Calle
 	fscanf(fp,"%49s %49s",caller1,caller2);
 	printf("------------------------------------------------------------------\n");
 	printf("Show everyone that has contacted %s and %s\n",caller1,caller2);
+	printf(">>> Not implemented <<<\n");
 	printf("------------------------------------------------------------------\n\n");
 
 	/* Not implemented */
@@ -184,6 +185,7 @@ void parse_print(FILE* fp,struct HashTable* CallerTable,struct HashTable* Callee
 	printf("\n");
 	free(tablestring);
 }
+
 void parse_dump(FILE* fp,struct HashTable* CallerTable,struct HashTable* CalleeTable)
 {
 	int tablenumber;
@@ -431,7 +433,7 @@ void parse_time_range(char* buffer, struct tm* from_date,struct tm* to_date ,int
 		/*time1 -> time2 */
 		if(length==5)
 		{
-			sscanf(buffer,"%02d : %02d  %02d : %02d",&from_date->tm_hour,&from_date->tm_min,&to_date->tm_hour,&to_date->tm_min);
+			sscanf(buffer,"%2d : %2d  %2d : %2d",&from_date->tm_hour,&from_date->tm_min,&to_date->tm_hour,&to_date->tm_min);
 			printf("%02d:%02d",from_date->tm_hour,from_date->tm_min);
 			printf(" ---> ");
 			printf("%02d:%02d\n",to_date->tm_hour,to_date->tm_min);
@@ -459,7 +461,7 @@ void parse_time_range(char* buffer, struct tm* from_date,struct tm* to_date ,int
 	/*time1,year1 -> time2,year2*/
 	else if(tokens==4)
 	{
-		sscanf(buffer,"%02d : %02d %02d %02d %4d %02d : %02d %02d %02d %4d ",&from_date->tm_hour,&from_date->tm_min,&from_date->tm_mday,&from_date->tm_mon,&from_date->tm_year,&to_date->tm_hour,&to_date->tm_min,&to_date->tm_mday,&to_date->tm_mon,&to_date->tm_year);
+		sscanf(buffer,"%2d : %2d %2d %2d %4d %2d : %2d %2d %2d %4d ",&from_date->tm_hour,&from_date->tm_min,&from_date->tm_mday,&from_date->tm_mon,&from_date->tm_year,&to_date->tm_hour,&to_date->tm_min,&to_date->tm_mday,&to_date->tm_mon,&to_date->tm_year);
 		printf("%02d/%02d/%d | %02d:%02d",from_date->tm_mday,from_date->tm_mon,from_date->tm_year,from_date->tm_hour,from_date->tm_min);
 		printf(" ---> ");
 		printf("%02d/%02d/%d | %02d:%02d\n",to_date->tm_mday,to_date->tm_mon,to_date->tm_year,to_date->tm_hour,to_date->tm_min);

@@ -4,6 +4,7 @@
 
 
 #include "hashtable.h"
+#include "bucket.h"/*for sizeof(struct CDRBucket)*/
 #include "heap.h"
 #include "parser.h"
 
@@ -32,16 +33,28 @@ int main(int argc,char* argv[])
 		else if(!strcmp("-h1",argv[i]))
 		{
 			ht1_size = atoi(argv[i+1]);
+			if (ht1_size<=0) {
+				fprintf(stderr, "Error: Hash Table 1 size is not a positive number\n");
+				exit(EXIT_FAILURE);
+			}
 			ht1_provided=1;
 		}
 		else if(!strcmp("-h2",argv[i]))
 		{
 			ht2_size = atoi(argv[i+1]);
+			if (ht2_size<=0) {
+				fprintf(stderr, "Error: Hash Table 2 size is not a positive number\n");
+				exit(EXIT_FAILURE);
+			}
 			ht2_provided=1;
 		}
 		else if(!strcmp("-s",argv[i]))
 		{
 			bucket_size = atoi(argv[i+1]);
+			if (bucket_size<=sizeof(struct CDRBucket)) {
+				fprintf(stderr, "Error: Bucket size is too small\n");
+				exit(EXIT_FAILURE);
+			}
 			bsize_provided=1;
 		}
 		else if(!strcmp("-c",argv[i]))

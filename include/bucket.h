@@ -14,7 +14,7 @@ struct NumberBucket
 /*Type 2 bucket*/
 struct CDRBucket
 {
-	char* cdr_uniq_id; 
+	char* cdr_uniq_id;
 	char* other_number;/*Caller or Callee*/
 	struct tm date;
 	int duration;
@@ -24,19 +24,19 @@ struct CDRBucket
 };
 
 /*Creates a new bucket*/
-void CreateBucket(void **,int,int);
+void bucket_create(void **,int,int);
 
 /*Destroys a bucket [free memory]*/
-void DestroyBucket(void*,int,int);
+void bucket_destroy(void*,int,int);
 
 /*Prints all CDRs*/
-void PrintCDRBucket(struct CDRBucket*,char*,int,int);
+void cdrbucket_print(struct CDRBucket*,char*,int,int);
 
 /*Prints CDRs in a specific time range*/
-int PrintCDR(struct CDRBucket*,char*,struct tm,struct tm,int,int,int);
+int cdr_print(struct CDRBucket*,char*,struct tm,struct tm,int,int,int);
 
 /*Dumps all CDRs in a file*/
-void DumpCDRBucket(void*,int,int,FILE*,char*);
+void cdrbucket_dump(void*,int,int,FILE*,char*);
 
 /*Copies a number to a NumberBucket slot*/
 void number_copy(struct NumberBucket*,char*);
@@ -45,6 +45,6 @@ void number_copy(struct NumberBucket*,char*);
 void cdr_copy(struct CDRBucket*,struct CDR*);
 
 /*Returns true if CDRBucket is empty*/
-int IsEmptyBucket(struct CDRBucket*,int);
+int bucket_is_empty(struct CDRBucket*,int);
 
 #endif

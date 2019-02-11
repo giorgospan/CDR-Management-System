@@ -10,7 +10,7 @@
 #define CDRBUCKETSIZE 2000
 
 
-void CreateBucket(void** bucket,int type,int slots)
+void bucket_create(void** bucket,int type,int slots)
 {
 	int i;
 
@@ -24,7 +24,7 @@ void CreateBucket(void** bucket,int type,int slots)
 		{
 			ptr[i].hash_key=NULL;
 			/*Create a CDR List */
-			CreateList(&(ptr[i].CDRList),CDRBUCKETSIZE,2);
+			list_create(&(ptr[i].CDRList),CDRBUCKETSIZE,2);
 		}
 
 	}
@@ -43,7 +43,7 @@ void CreateBucket(void** bucket,int type,int slots)
 
 }
 
-void DestroyBucket(void* bucket,int buckettype,int slots)
+void bucket_destroy(void* bucket,int buckettype,int slots)
 {
 	int i;
 	/*Destroy bucket of the first buckettype [Number bucket]*/
@@ -53,7 +53,7 @@ void DestroyBucket(void* bucket,int buckettype,int slots)
 		for(i=0;i<slots;++i)
 		{
 			if(ptr[i].hash_key)free(ptr[i].hash_key);
-			ListDestroy(ptr[i].CDRList);
+			list_destroy(ptr[i].CDRList);
 		}
 	}
 
@@ -77,7 +77,7 @@ void DestroyBucket(void* bucket,int buckettype,int slots)
 /*tabletype is needed in order to know which number to print first.*/
 /*if it's 1 , then print first hash_key  [CallerTalbe]*/
 /*if it's 2 , then print first the other_number [CalleeTalbe]*/
-int PrintCDR(struct CDRBucket* bucket,char* hash_key,struct tm from_date,struct tm to_date,int flag,int slots,int tabletype)
+int cdr_print(struct CDRBucket* bucket,char* hash_key,struct tm from_date,struct tm to_date,int flag,int slots,int tabletype)
 {
 	int found_cdr=0;
 	int i;
@@ -112,7 +112,7 @@ int PrintCDR(struct CDRBucket* bucket,char* hash_key,struct tm from_date,struct 
 	return found_cdr;
 }
 
-void PrintCDRBucket(struct CDRBucket* bucket,char* hash_key,int slots,int tabletype)
+void cdrbucket_print(struct CDRBucket* bucket,char* hash_key,int slots,int tabletype)
 {
 	int i;
 	struct CDRBucket* ptr=bucket;
@@ -143,7 +143,7 @@ void PrintCDRBucket(struct CDRBucket* bucket,char* hash_key,int slots,int tablet
 	}
 }
 
-void DumpCDRBucket(void* bucket,int tabletype,int slots,FILE* fp,char* hash_key)
+void cdrbucket_dump(void* bucket,int tabletype,int slots,FILE* fp,char* hash_key)
 {
 	int i;
 	struct CDRBucket* ptr=bucket;
@@ -172,7 +172,7 @@ void DumpCDRBucket(void* bucket,int tabletype,int slots,FILE* fp,char* hash_key)
 	}
 }
 
-int IsEmptyBucket(struct CDRBucket* bucket,int slots)
+int bucket_is_empty(struct CDRBucket* bucket,int slots)
 {
 	int i;
 	/*Scan every Slot until you find a filled one*/

@@ -8,7 +8,7 @@
 #include "parser.h" /*for parse_time_range()*/
 
 
-void CreateList(struct List** list,int bsize,int t)
+void list_create(struct List** list,int bsize,int t)
 {
 	*list         = malloc(sizeof(struct List));
 	(*list)->head = NULL;
@@ -33,7 +33,7 @@ void CreateList(struct List** list,int bsize,int t)
 	}
 }
 
-void ListAddNode(struct List* list)
+void list_add_node(struct List* list)
 {
 	struct ListNode *node = malloc(sizeof(struct ListNode));
 	node->next            = NULL;
@@ -47,19 +47,19 @@ void ListAddNode(struct List* list)
 		list->tail->next = node;
 		list->tail       = node;
 	}
-	CreateBucket(&node->bucket,list->bucketType,list->bucketSlots);
+	bucket_create(&node->bucket,list->bucketType,list->bucketSlots);
 	/*First available slot :  First slot of the newly created bucket */
 	list->available_slot = node->bucket;
 }
 
-void ListInsert(struct List* list,struct CDR* cdr)
+void list_insert(struct List* list,struct CDR* cdr)
 {
 	struct NumberBucket* temp;
 
 	/*Checking if I should add a new node*/
 	if( (list->empty) || (list->counter % list->bucketSlots == 0 && list->moved_available)  )
 	{
-		ListAddNode(list);
+		list_add_node(list);
 		list->empty=0;
 		list->moved_available=0;
 	}
@@ -70,17 +70,20 @@ void ListInsert(struct List* list,struct CDR* cdr)
 		Insert CDR to the CDR List of this number */
 		if(temp=search_number(list,cdr->hash_key))
 		{
-			ListInsert(temp->CDRList,cdr);
+			list_insert(temp->CDRList,cdr);
 			list->moved_available=0;
 		}
 
-		/*If number doesnt exist:
-		Insert this number to the first available_slot
-		Insert this CDR to the CDR List of this number  */
+		/**
+		 * If number doesnt exist:
+		 *
+		 * Insert this number to the first available_slot
+		 * Insert this CDR to the CDR List of this number
+		 */
 		else
 		{
 			number_copy(((struct NumberBucket*)(list->available_slot)),cdr->hash_key);
-			ListInsert(((struct NumberBucket*)(list->available_slot))->CDRList,cdr);
+			list_insert(((struct NumberBucket*)(list->available_slot))->CDRList,cdr);
 			list->available_slot+=list->SlotSize;
 			list->moved_available=1;
 			++list->counter;
@@ -97,7 +100,7 @@ void ListInsert(struct List* list,struct CDR* cdr)
 	}
 }
 
-int ListFind(struct List* list,char* caller,char* time_range,int tabletype)
+int list_find(struct List* list,char* caller,char* time_range,int tabletype)
 {
 	struct NumberBucket* temp;
 	int found_cdr = 0;
@@ -112,12 +115,12 @@ int ListFind(struct List* list,char* caller,char* time_range,int tabletype)
 	if(!(temp=search_number(list,caller)))return 0; /*Number was not found*/
 	else
 	{
-		/*If found : call PrintCDR for each CDRBucket of this number*/
+		/*If found : call cdr_print for each CDRBucket of this number*/
 
 		struct ListNode* current=temp->CDRList->head;
 		while(current)
 		{
-			if(PrintCDR((struct CDRBucket*)(current->bucket),caller,from_date,to_date,flag,temp->CDRList->bucketSlots,tabletype))found_cdr=1;
+			if(cdr_print((struct CDRBucket*)(current->bucket),caller,from_date,to_date,flag,temp->CDRList->bucketSlots,tabletype))found_cdr=1;
 			current=current->next;
 		}
 
@@ -128,7 +131,7 @@ int ListFind(struct List* list,char* caller,char* time_range,int tabletype)
 	}
 }
 
-int ListLookUp(struct List* list,char* callee,char* time_range,int tabletype)
+int list_lookup(struct List* list,char* callee,char* time_range,int tabletype)
 {
 	struct NumberBucket* temp;
 	int flag;
@@ -143,12 +146,12 @@ int ListLookUp(struct List* list,char* callee,char* time_range,int tabletype)
 	if(!(temp=search_number(list,callee)))return 0; /*Number was not found*/
 	else
 	{
-		/*If found : call PrintCDR for each CDRBucket of this number*/
+		/*If found : call cdr_print for each CDRBucket of this number*/
 
 		struct ListNode* current=temp->CDRList->head;
 		while(current)
 		{
-			if(PrintCDR((struct CDRBucket*)(current->bucket),callee,from_date,to_date,flag,temp->CDRList->bucketSlots,tabletype))found_cdr=1;
+			if(cdr_print((struct CDRBucket*)(current->bucket),callee,from_date,to_date,flag,temp->CDRList->bucketSlots,tabletype))found_cdr=1;
 			current=current->next;
 		}
 		/*After having scanned each bucket of the CDRList*/
@@ -158,7 +161,7 @@ int ListLookUp(struct List* list,char* callee,char* time_range,int tabletype)
 	}
 }
 
-void ListPrint(struct List* list,char* hash_key,int tabletype)
+void list_print(struct List* list,char* hash_key,int tabletype)
 {
 	struct ListNode* current=list->head;
 	int i;
@@ -173,7 +176,7 @@ void ListPrint(struct List* list,char* hash_key,int tabletype)
 			ptr= current->bucket;
 			for(i=0;i<list->bucketSlots;++i)
 			{
-				if(ptr[i].hash_key)ListPrint(ptr[i].CDRList,ptr[i].hash_key,tabletype);
+				if(ptr[i].hash_key)list_print(ptr[i].CDRList,ptr[i].hash_key,tabletype);
 			}
 			/*Move to next node*/
 			current=current->next;
@@ -185,14 +188,14 @@ void ListPrint(struct List* list,char* hash_key,int tabletype)
 		while(current)
 		{
 			/*Print CDRBucket*/
-			PrintCDRBucket((struct CDRBucket*)(current->bucket),hash_key,list->bucketSlots,tabletype);
+			cdrbucket_print((struct CDRBucket*)(current->bucket),hash_key,list->bucketSlots,tabletype);
 			/*Move to next node*/
 			current=current->next;
 		}
 	}
 }
 
-void ListDeleteNode(struct List* list,struct ListNode* prev,struct ListNode* node)
+void list_delete_node(struct List* list,struct ListNode* prev,struct ListNode* node)
 {
 	/*Deleting head of the list*/
 	if(list->head==prev)
@@ -218,7 +221,7 @@ void ListDeleteNode(struct List* list,struct ListNode* prev,struct ListNode* nod
 	}
 }
 
-int ListDelete(struct List* list,char* caller,char* cdr_id)
+int list_delete(struct List* list,char* caller,char* cdr_id)
 {
 	struct NumberBucket* position;
 	struct ListNode* previous;
@@ -240,12 +243,12 @@ int ListDelete(struct List* list,char* caller,char* cdr_id)
 			position->CDRList->counter--;
 			/*If CDRbucket becomes empty --> Delete this ListNode*/
 			if(previous==position->CDRList->head)
-				empty = IsEmptyBucket( (struct CDRBucket*)(position->CDRList->head->bucket)	, position->CDRList->bucketSlots  );
+				empty = bucket_is_empty( (struct CDRBucket*)(position->CDRList->head->bucket)	, position->CDRList->bucketSlots  );
 			else
-			  empty = IsEmptyBucket( (struct CDRBucket*)(previous->next->bucket), position->CDRList->bucketSlots  );
+			  empty = bucket_is_empty( (struct CDRBucket*)(previous->next->bucket), position->CDRList->bucketSlots  );
 
 			if(empty)
-				ListDeleteNode(position->CDRList,previous,previous->next);
+				list_delete_node(position->CDRList,previous,previous->next);
 
 			/*Returns true because we found the given (caller,cdr) pair*/
 			return 1;
@@ -254,7 +257,7 @@ int ListDelete(struct List* list,char* caller,char* cdr_id)
 	return 0;
 }
 
-void ListDump(struct List* list,int tabletype,FILE* fp,char* hash_key)
+void list_dump(struct List* list,int tabletype,FILE* fp,char* hash_key)
 {
 	struct ListNode* current=list->head;
 	int i;
@@ -269,7 +272,7 @@ void ListDump(struct List* list,int tabletype,FILE* fp,char* hash_key)
 			ptr= current->bucket;
 			for(i=0;i<list->bucketSlots;++i)
 			{
-				if(ptr[i].hash_key)ListDump(ptr[i].CDRList,tabletype,fp,ptr[i].hash_key);
+				if(ptr[i].hash_key)list_dump(ptr[i].CDRList,tabletype,fp,ptr[i].hash_key);
 			}
 			/*Move to next node*/
 			current=current->next;
@@ -281,14 +284,14 @@ void ListDump(struct List* list,int tabletype,FILE* fp,char* hash_key)
 		while(current)
 		{
 			/*Dump CDRBucket*/
-			DumpCDRBucket(current->bucket,tabletype,list->bucketSlots,fp,hash_key);
+			cdrbucket_dump(current->bucket,tabletype,list->bucketSlots,fp,hash_key);
 			/*Move to next node*/
 			current=current->next;
 		}
 	}
 }
 
-int ListTopDest(struct List* list,char* caller)
+int list_topdest(struct List* list,char* caller)
 {
 	struct NumberBucket* position;
 	struct CDRBucket* ptr;
@@ -333,7 +336,7 @@ int ListTopDest(struct List* list,char* caller)
 	return 0;
 }
 
-void ListDestroy(struct List* list)
+void list_destroy(struct List* list)
 {
 	struct ListNode* current=list->head;
 	struct ListNode* temp;
@@ -341,7 +344,7 @@ void ListDestroy(struct List* list)
 	while(current)
 	{
 		/*Destroy Bucket*/
-		DestroyBucket(current->bucket,list->bucketType,list->bucketSlots);
+		bucket_destroy(current->bucket,list->bucketType,list->bucketSlots);
 
 		/*Destroy current node*/
 		temp=current;

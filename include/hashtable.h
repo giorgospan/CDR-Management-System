@@ -43,14 +43,14 @@ void ht_topdest(struct HashTable*,char*);
 void TableIndist(struct HashTable*,char*,char*);
 
 /*Prints all CDRs*/
-/*Calls ListPrint for every list of the table*/
+/*Calls list_print for every list of the table*/
 void ht_print(struct HashTable* );
 
 /*Dumps CDRs into a dump file*/
-/*Calls ListDump for every list of the table*/
+/*Calls list_dump for every list of the table*/
 void ht_dump(struct HashTable*,char* );
 
-/*Calls ListDestroy for every list of the table*/
+/*Calls list_destroy for every list of the table*/
 /*Frees memory allocated for the table itself*/
 void ht_destroy(struct HashTable*);
 

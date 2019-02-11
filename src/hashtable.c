@@ -22,7 +22,7 @@ void ht_create(struct HashTable** HTPtrPtr, int HTSize,int HTType,int bsize)
 	for(i=0;i<HTSize;++i)
 	{
 		/*Creating a List with buckets of type 1 for each Hashtable entry*/
-		CreateList((*HTPtrPtr) -> table+i,bsize,1);
+		list_create((*HTPtrPtr) -> table+i,bsize,1);
 	}
 
 	// printf("HT has been created\n");
@@ -55,7 +55,7 @@ void ht_insert(struct HashTable* HTPtr,struct CDR* cdr)
 	hashval = hashfun(HTPtr,number);
 	free(number);
 
-	ListInsert((HTPtr->table)[hashval],cdr);
+	list_insert((HTPtr->table)[hashval],cdr);
 	++HTPtr->records;
 }
 
@@ -65,7 +65,7 @@ void ht_delete(struct HashTable* HTPtr,char* caller,char* cdr_id)
 	int deleted = 0;
 
 	hashval = hashfun(HTPtr,caller);
-	deleted = ListDelete(HTPtr->table[hashval],caller,cdr_id);
+	deleted = list_delete(HTPtr->table[hashval],caller,cdr_id);
 
 	if(deleted)
 	{
@@ -80,7 +80,7 @@ void ht_find(struct HashTable* HTPtr,char* caller,char* time_range)
 	int hashval;
 	int found;
 	hashval = hashfun(HTPtr,caller);
-	found   = ListFind((HTPtr->table)[hashval],caller,time_range,HTPtr->type);
+	found   = list_find((HTPtr->table)[hashval],caller,time_range,HTPtr->type);
 	if(!found)
 	{
 		printf("Caller %s could not be found\n",caller);
@@ -92,7 +92,7 @@ void ht_lookup(struct HashTable* HTPtr,char* callee,char* time_range)
 	int hashval;
 	int found;
 	hashval = hashfun(HTPtr,callee);
-	found   = ListLookUp((HTPtr->table)[hashval],callee,time_range,HTPtr->type);
+	found   = list_lookup((HTPtr->table)[hashval],callee,time_range,HTPtr->type);
 	if(!found)
 	{
 		printf("Callee with number %s could not be found\n",callee);
@@ -104,7 +104,7 @@ void ht_topdest(struct HashTable* HTPtr,char* caller)
 	int hashval;
 	int found;
 	hashval = hashfun(HTPtr,caller);
-	found = ListTopDest((HTPtr->table)[hashval],caller);
+	found = list_topdest((HTPtr->table)[hashval],caller);
 	if(!found)
 	{
 		printf("Caller with number %s could not be found\n",caller);
@@ -116,7 +116,7 @@ void ht_print(struct HashTable* HTPtr)
 	int i;
 	for(i=0;i<HTPtr->size;++i)
 	{
-		ListPrint((HTPtr->table)[i],NULL,HTPtr->type);
+		list_print((HTPtr->table)[i],NULL,HTPtr->type);
 	}
 }
 
@@ -126,7 +126,7 @@ void ht_dump(struct HashTable* HTPtr,char* dump_file)
 	FILE* fp = fopen(dump_file,"w");
 	for(i=0;i<HTPtr->size;++i)
 	{
-		ListDump(HTPtr->table[i],HTPtr->type,fp,NULL);
+		list_dump(HTPtr->table[i],HTPtr->type,fp,NULL);
 	}
 	fclose(fp);
 }
@@ -137,7 +137,7 @@ void ht_destroy(struct HashTable* HTPtr)
 	//BucketSum();
 
 	/*Destroying each list of the table*/
-	for(i=0;i<HTPtr->size;++i)ListDestroy(HTPtr->table[i]);
+	for(i=0;i<HTPtr->size;++i)list_destroy(HTPtr->table[i]);
 
 	printf("---------------------\n");
 	printf("HT has been destroyed\n");
