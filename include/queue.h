@@ -18,16 +18,16 @@ struct QueueNode
 };
 
 
-void QueueCreate(struct Queue**);
+void queue_create(struct Queue**);
 
-int QueueIsEmpty(struct Queue*);
+int queue_is_empty(struct Queue*);
 
-void Enqueue(struct Queue* ,struct HeapNode*);
+void enqueue(struct Queue* ,struct HeapNode*);
 
-struct HeapNode* Dequeue(struct Queue*);
+struct HeapNode* dequeue(struct Queue*);
 
-void QueueDestroy(struct Queue*);
+void queue_destroy(struct Queue*);
 
-void Print(struct Queue*);
+void queue_print(struct Queue*);
 
 #endif

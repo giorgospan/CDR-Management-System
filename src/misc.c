@@ -6,11 +6,14 @@
 
 int compare(struct tm from_date,struct tm to_date,struct tm current_date,int flag)
 {
-	/*	0:	no time range provided
-		1:	time1 -> time2
-		2:	year1 -> year2
-		3:	time1,year1  --> time2,year2
-	*/
+
+	/**
+	 * 0:	no time range provided
+	 * 1:	time1 -> time2
+	 * 2:	year1 -> year2
+	 * 3:	time1,year1  --> time2,year2
+	 */
+
 	double diff1;
 	double diff2;
 

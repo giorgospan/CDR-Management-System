@@ -7,19 +7,19 @@
 #include "auxqueue.h"
 #include "heap.h"
 
-void AuxQueueCreate(struct AuxQueue** queue)
+void aux_queue_create(struct AuxQueue** queue)
 {
 
 	*queue=malloc(sizeof(struct AuxQueue));
 	(*queue)->front=(*queue)->rear=NULL;
 }
 
-int AuxQueueIsEmpty(struct AuxQueue* queue)
+int aux_queue_is_empty(struct AuxQueue* queue)
 {
 	return queue->front==NULL;
 }
 
-void AuxEnqueue(struct AuxQueue* queue,char* caller,float bill,float percent)
+void aux_enqueue(struct AuxQueue* queue,char* caller,float bill,float percent)
 {
 
 	struct AuxQueueNode* temp = malloc(sizeof(struct AuxQueueNode));
@@ -39,25 +39,25 @@ void AuxEnqueue(struct AuxQueue* queue,char* caller,float bill,float percent)
 	queue->rear = temp;
 }
 
-void ReInsert(struct AuxQueue* queue,struct Heap* heap)
+void re_insert(struct AuxQueue* queue,struct Heap* heap)
 {
 	struct AuxQueueNode* current;
 	current=queue->front;
 
 	while(current)
 	{
-		HeapInsert(heap,current->data.caller,current->data.bill);
+		heap_insert(heap,current->data.caller,current->data.bill);
 		current=current->next;
-		AuxDequeue(queue);
+		aux_dequeue(queue);
 	}
 }
 
-void AuxDequeue(struct AuxQueue* queue)
+void aux_dequeue(struct AuxQueue* queue)
 {
 	struct AuxQueueNode* temp = queue->front;
 	if(queue->front == NULL)
 	{
-		printf("Dequeue: AuxQueue is Empty\n");
+		printf("dequeue: AuxQueue is Empty\n");
 		return;
 	}
 	if(queue->front == queue->rear)
@@ -72,7 +72,7 @@ void AuxDequeue(struct AuxQueue* queue)
 	free(temp);
 }
 
-void AuxQueueDestroy(struct AuxQueue* queue)
+void aux_queue_destroy(struct AuxQueue* queue)
 {
 	struct AuxQueueNode* current;
 	struct AuxQueueNode* temp;
@@ -88,7 +88,7 @@ void AuxQueueDestroy(struct AuxQueue* queue)
 	free(queue);
 }
 
-void PrintAuxQueue(struct AuxQueue* queue)
+void aux_queue_print(struct AuxQueue* queue)
 {
 	float s=0;
 	printf("Subscribers:\n");

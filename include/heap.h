@@ -25,23 +25,23 @@ struct Heap
 
 
 /*Creates Heap*/
-void HeapCreate(struct Heap**);
+void heap_create(struct Heap**);
 
 
 /*Destroys the Heap*/
-void HeapDestroy(struct Heap*);
+void heap_destroy(struct Heap*);
 
 /*Destroys recursively each node*/
-void HeapDestroyRecursive(struct HeapNode*);
+void heap_destroy_rec(struct HeapNode*);
 
 /*Inserting a  new element into the heap*/
-void HeapInsert(struct Heap*,char*,float);
+void heap_insert(struct Heap*,char*,float);
 
 /*Adds a new node */
-void HeapAddNode(struct Heap*,struct HeapNode** ,struct HeapNode*,char,char*,float );
+void heap_add_node(struct Heap*,struct HeapNode** ,struct HeapNode*,char,char*,float );
 
 /*Extracts Root's value*/
-int ExtractRoot(struct Heap* heap,struct aux_struct*);
+int extract_root(struct Heap* heap,struct aux_struct*);
 
 /*Shifts up elements until the heap property is satisfied*/
 void shift_up(struct Heap*,struct HeapNode*);
@@ -50,10 +50,10 @@ void shift_up(struct Heap*,struct HeapNode*);
 void shift_down(struct Heap* heap,struct HeapNode* node);
 
 /*Prints Heap nodes using BFS*/
-void PrintHeap(struct Heap*);
+void heap_print(struct Heap*);
 
 /*Prints top subscribers that make top k % of revenue*/
-void HeapTop(struct Heap*,float);
+void heap_top(struct Heap*,float);
 
 /*Swaps two nodes*/
 /*Just their stored data [caller and bill] not the whole nodes*/

@@ -8,7 +8,7 @@
 #include "auxqueue.h"
 
 
-void HeapCreate(struct Heap** heap)
+void heap_create(struct Heap** heap)
 {
 	*heap=malloc(sizeof(struct Heap));
 	(*heap)->root= NULL;
@@ -17,25 +17,24 @@ void HeapCreate(struct Heap** heap)
 	(*heap)->revenue=0;
 }
 
-void HeapDestroyRecursive(struct HeapNode* node)
+void heap_destroy_rec(struct HeapNode* node)
 {
 	if(node==NULL)return;
 
-	HeapDestroyRecursive(node->left);
-	HeapDestroyRecursive(node->right);
+	heap_destroy_rec(node->left);
+	heap_destroy_rec(node->right);
 
 	free(node->caller);
 	free(node);
 }
 
-void HeapDestroy(struct Heap* heap)
+void heap_destroy(struct Heap* heap)
 {
-	HeapDestroyRecursive(heap->root);
+	heap_destroy_rec(heap->root);
 	free(heap);
 }
 
-
-void HeapAddNode(struct Heap* heap,struct HeapNode** new_node,struct HeapNode* parent,char position,char* caller,float charge)
+void heap_add_node(struct Heap* heap,struct HeapNode** new_node,struct HeapNode* parent,char position,char* caller,float charge)
 {
 	(*new_node)=malloc(sizeof(struct HeapNode));
 	(*new_node)->bill=charge;
@@ -114,7 +113,6 @@ void shift_up(struct Heap* heap,struct HeapNode* node)
 	}
 }
 
-
 void shift_down(struct Heap* heap,struct HeapNode* node)
 {
 	float max_val=node->bill;
@@ -147,7 +145,7 @@ void shift_down(struct Heap* heap,struct HeapNode* node)
 }
 
 /*O(n) : linear search required*/
-void HeapInsert(struct Heap* heap,char* caller,float charge)
+void heap_insert(struct Heap* heap,char* caller,float charge)
 {
 	char position;
 	int found=0;
@@ -176,11 +174,11 @@ void HeapInsert(struct Heap* heap,char* caller,float charge)
 
 	/*BFS until the caller has been found or until the end of Heap*/
 	struct Queue* queue;
-	QueueCreate(&queue);
-	Enqueue(queue,heap->root);
-	while(!QueueIsEmpty(queue))
+	queue_create(&queue);
+	enqueue(queue,heap->root);
+	while(!queue_is_empty(queue))
 	{
-		current=Dequeue(queue);
+		current=dequeue(queue);
 		parent=current->parent;
 
 
@@ -193,7 +191,7 @@ void HeapInsert(struct Heap* heap,char* caller,float charge)
 
 		/*Need to hold the first node found without a child[either left or right]  in case the given caller is not in the heap */
 		/*Otherwise,i will just update the given caller*/
-		if(current->left != NULL)Enqueue(queue,current->left);
+		if(current->left != NULL)enqueue(queue,current->left);
 		else if(!found_empty)
 		{
 			new_node=current->left;
@@ -201,7 +199,7 @@ void HeapInsert(struct Heap* heap,char* caller,float charge)
 			position='l';
 			found_empty=1;
 		}
-		if(current->right!=NULL)Enqueue(queue,current->right);
+		if(current->right!=NULL)enqueue(queue,current->right);
 		else if(!found_empty)
 		{
 			parent_of_empty=current;
@@ -210,7 +208,7 @@ void HeapInsert(struct Heap* heap,char* caller,float charge)
 			found_empty=1;
 		}
 	}
-	QueueDestroy(queue);
+	queue_destroy(queue);
 
 	/*If found: Update and shift_up starting from parent of found node*/
 	if(found)
@@ -223,16 +221,16 @@ void HeapInsert(struct Heap* heap,char* caller,float charge)
 	/*Else: Create a new node and shift_up starting from parent of the new node*/
 	else
 	{
-		HeapAddNode(heap,&new_node,parent_of_empty,position,caller,charge);
+		heap_add_node(heap,&new_node,parent_of_empty,position,caller,charge);
 		shift_up(heap,parent_of_empty);
 	}
 }
 
-int ExtractRoot(struct Heap* heap,struct aux_struct* return_value)
+int extract_root(struct Heap* heap,struct aux_struct* return_value)
 {
 	/*Heap is empty*/
 	if(heap->counter==0)return 0;
-	// PrintHeap(heap);
+	// heap_print(heap);
 	float root_bill=heap->root->bill;
 	/*this struct will contain root's (caller,bill) pair*/
 	return_value->bill=root_bill;
@@ -248,17 +246,17 @@ int ExtractRoot(struct Heap* heap,struct aux_struct* return_value)
 		struct HeapNode* last_node;
 		struct HeapNode* parent_of_last_node;
 		struct Queue* queue;
-		QueueCreate(&queue);
-		Enqueue(queue,heap->root);
-		while(!QueueIsEmpty(queue))
+		queue_create(&queue);
+		enqueue(queue,heap->root);
+		while(!queue_is_empty(queue))
 		{
-			current=Dequeue(queue);
+			current=dequeue(queue);
 			last_node=current;
 			parent_of_last_node=last_node->parent;
-			if(current->left != NULL)Enqueue(queue,current->left);
-			if(current->right != NULL)Enqueue(queue,current->right);
+			if(current->left != NULL)enqueue(queue,current->left);
+			if(current->right != NULL)enqueue(queue,current->right);
 		}
-		QueueDestroy(queue);
+		queue_destroy(queue);
 
 
 		/*Swap data of last and root*/
@@ -285,7 +283,7 @@ int ExtractRoot(struct Heap* heap,struct aux_struct* return_value)
 
 }
 
-void HeapTop(struct Heap* heap,float  percentage)
+void heap_top(struct Heap* heap,float  percentage)
 {
 	/*Keeping starting revenue because im gonna extract some nodes from the heap*/
 	float starting_rev=heap->revenue;
@@ -315,7 +313,7 @@ void HeapTop(struct Heap* heap,float  percentage)
 
 	/*This queue will contain the (caller,bill) pairs we are searching for*/
 	struct AuxQueue* queue;
-	AuxQueueCreate(&queue);
+	aux_queue_create(&queue);
 
 
 	/*Fill this Queue with the extracted roots until we reach total*/
@@ -323,45 +321,44 @@ void HeapTop(struct Heap* heap,float  percentage)
 	{
 		extracted=malloc(sizeof(struct aux_struct));
 		/*Heap has no more nodes*/
-		if(!ExtractRoot(heap,extracted))break;
+		if(!extract_root(heap,extracted))break;
 
 		current_sum+=extracted->bill;
 		/*Insert extracted data into the AuxQueue*/
-		AuxEnqueue(queue,extracted->caller,extracted->bill,extracted->bill/starting_rev*100);
+		aux_enqueue(queue,extracted->caller,extracted->bill,extracted->bill/starting_rev*100);
 
 		free(extracted->caller);
 		free(extracted);
 	}
 	/*Print Result*/
-	PrintAuxQueue(queue);
+	aux_queue_print(queue);
 
 	/*Insert in the heap the extracted nodes that were temporarily stored in AuxQueue*/
-	ReInsert(queue,heap);
+	re_insert(queue,heap);
 	/*Destroy AuxQueue*/
-	AuxQueueDestroy(queue);
+	aux_queue_destroy(queue);
 }
 
-
-void PrintHeap(struct Heap* heap)
+void heap_print(struct Heap* heap)
 {
-	printf("PrintHeap:\n----------\n");
+	printf("heap_print:\n----------\n");
 	if(heap->root==NULL){printf("Heap is empty\n");return;}
 	struct HeapNode* current=heap->root;
 
 	/*Breadth First Traversal of the heap[using a queue]*/
 	struct Queue* queue;
-	QueueCreate(&queue);
-	Enqueue(queue,heap->root);
+	queue_create(&queue);
+	enqueue(queue,heap->root);
 
-	while(!QueueIsEmpty(queue))
+	while(!queue_is_empty(queue))
 	{
-		current=Dequeue(queue);
+		current=dequeue(queue);
 		printf("Caller:%s | Bill:%f\n",current->caller,current->bill);
 
-		if(current->left != NULL)Enqueue(queue,current->left);
-		if(current->right!=NULL)Enqueue(queue,current->right);
+		if(current->left != NULL)enqueue(queue,current->left);
+		if(current->right!=NULL)enqueue(queue,current->right);
 	}
-	QueueDestroy(queue);
+	queue_destroy(queue);
 	printf("===============================\n");
 	printf("Nodes:%d\nRevenue:%f euros\n\n",heap->counter,heap->revenue);
 }

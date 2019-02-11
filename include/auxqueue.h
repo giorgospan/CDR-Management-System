@@ -29,24 +29,24 @@ struct AuxQueue
 
 
 /*Creates an AuxQueue*/
-void AuxQueueCreate(struct AuxQueue**);
+void aux_queue_create(struct AuxQueue**);
 
 /*returns true if AuxQueue is empty*/
-int AuxQueueIsEmpty(struct AuxQueue*);
+int aux_queue_is_empty(struct AuxQueue*);
 
 /*Inserts into the heap all the nodes of the queue*/
-void ReInsert(struct AuxQueue*,struct Heap*);
+void re_insert(struct AuxQueue*,struct Heap*);
 
 /*Adds a new node to the rear end of the queue*/
-void AuxEnqueue(struct AuxQueue* ,char* ,float,float);
+void aux_enqueue(struct AuxQueue* ,char* ,float,float);
 
 /*Deletes a node from the front end of the queue*/
-void AuxDequeue(struct AuxQueue*);
+void aux_dequeue(struct AuxQueue*);
 
 /*Destroys the queue*/
-void AuxQueueDestroy(struct AuxQueue*);
+void aux_queue_destroy(struct AuxQueue*);
 
 /*Prints queue nodes*/
-void PrintAuxQueue(struct AuxQueue*);
+void aux_queue_print(struct AuxQueue*);
 
 #endif

@@ -8,7 +8,7 @@
 #include "bucket.h"
 #include "misc.h"
 
-void CreateTable(struct HashTable** HTPtrPtr, int HTSize,int HTType,int bsize)
+void ht_create(struct HashTable** HTPtrPtr, int HTSize,int HTType,int bsize)
 {
 	int i;
 	*HTPtrPtr = malloc(sizeof(struct HashTable));
@@ -32,7 +32,7 @@ void CreateTable(struct HashTable** HTPtrPtr, int HTSize,int HTType,int bsize)
 	// printf("---------------------\n\n");
 }
 
-int HashFunction(struct HashTable* HTPtr,char* number)
+int hashfun(struct HashTable* HTPtr,char* number)
 {
 	int i;
 	int sum=0;
@@ -43,7 +43,7 @@ int HashFunction(struct HashTable* HTPtr,char* number)
 	return sum % HTPtr->size ;
 }
 
-void TableInsert(struct HashTable* HTPtr,struct CDR* cdr)
+void ht_insert(struct HashTable* HTPtr,struct CDR* cdr)
 {
 	int i;
 	int hashval;
@@ -52,19 +52,19 @@ void TableInsert(struct HashTable* HTPtr,struct CDR* cdr)
 
 	number  = malloc((strlen(cdr->hash_key)+1)*sizeof(char));
 	strcpy(number,cdr->hash_key);
-	hashval = HashFunction(HTPtr,number);
+	hashval = hashfun(HTPtr,number);
 	free(number);
 
 	ListInsert((HTPtr->table)[hashval],cdr);
 	++HTPtr->records;
 }
 
-void TableDelete(struct HashTable* HTPtr,char* caller,char* cdr_id)
+void ht_delete(struct HashTable* HTPtr,char* caller,char* cdr_id)
 {
 	int hashval;
 	int deleted = 0;
 
-	hashval = HashFunction(HTPtr,caller);
+	hashval = hashfun(HTPtr,caller);
 	deleted = ListDelete(HTPtr->table[hashval],caller,cdr_id);
 
 	if(deleted)
@@ -75,11 +75,11 @@ void TableDelete(struct HashTable* HTPtr,char* caller,char* cdr_id)
 	else printf("DError\n");
 }
 
-void TableFind(struct HashTable* HTPtr,char* caller,char* time_range)
+void ht_find(struct HashTable* HTPtr,char* caller,char* time_range)
 {
 	int hashval;
 	int found;
-	hashval = HashFunction(HTPtr,caller);
+	hashval = hashfun(HTPtr,caller);
 	found   = ListFind((HTPtr->table)[hashval],caller,time_range,HTPtr->type);
 	if(!found)
 	{
@@ -87,11 +87,11 @@ void TableFind(struct HashTable* HTPtr,char* caller,char* time_range)
 	}
 }
 
-void TableLookUp(struct HashTable* HTPtr,char* callee,char* time_range)
+void ht_lookup(struct HashTable* HTPtr,char* callee,char* time_range)
 {
 	int hashval;
 	int found;
-	hashval = HashFunction(HTPtr,callee);
+	hashval = hashfun(HTPtr,callee);
 	found   = ListLookUp((HTPtr->table)[hashval],callee,time_range,HTPtr->type);
 	if(!found)
 	{
@@ -99,11 +99,11 @@ void TableLookUp(struct HashTable* HTPtr,char* callee,char* time_range)
 	}
 }
 
-void TableTopDest(struct HashTable* HTPtr,char* caller)
+void ht_topdest(struct HashTable* HTPtr,char* caller)
 {
 	int hashval;
 	int found;
-	hashval = HashFunction(HTPtr,caller);
+	hashval = hashfun(HTPtr,caller);
 	found = ListTopDest((HTPtr->table)[hashval],caller);
 	if(!found)
 	{
@@ -111,7 +111,7 @@ void TableTopDest(struct HashTable* HTPtr,char* caller)
 	}
 }
 
-void TablePrint(struct HashTable* HTPtr)
+void ht_print(struct HashTable* HTPtr)
 {
 	int i;
 	for(i=0;i<HTPtr->size;++i)
@@ -120,7 +120,7 @@ void TablePrint(struct HashTable* HTPtr)
 	}
 }
 
-void TableDump(struct HashTable* HTPtr,char* dump_file)
+void ht_dump(struct HashTable* HTPtr,char* dump_file)
 {
 	int i;
 	FILE* fp = fopen(dump_file,"w");
@@ -131,7 +131,7 @@ void TableDump(struct HashTable* HTPtr,char* dump_file)
 	fclose(fp);
 }
 
-void TableDestroy(struct HashTable* HTPtr)
+void ht_destroy(struct HashTable* HTPtr)
 {
 	int i;
 	//BucketSum();
@@ -153,8 +153,6 @@ void TableDestroy(struct HashTable* HTPtr)
 	free(HTPtr->table);
 	free(HTPtr);
 }
-
-
 
 
 

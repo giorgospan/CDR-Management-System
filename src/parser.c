@@ -35,18 +35,18 @@ void parse_insert(FILE* fp,FILE* fpconfig,struct HashTable* CallerTable,struct H
 
 	strcpy(record.hash_key,caller_number);
 	strcpy(record.other_number,callee_number);
-	TableInsert(CallerTable,&record);
+	ht_insert(CallerTable,&record);
 
 	/*Checking if fault condition of type "2XX" */
 	if(record.fault_condition>=200 && record.fault_condition<=299)
 	{
 		charge=parse_confile(fpconfig,record.type,record.tarrif,record.duration);
-		HeapInsert(heap,record.hash_key,charge);
+		heap_insert(heap,record.hash_key,charge);
 	}
 
 	strcpy(record.hash_key,callee_number);
 	strcpy(record.other_number,caller_number);
-	TableInsert(CalleeTable,&record);
+	ht_insert(CalleeTable,&record);
 
 	free(record.cdr_uniq_id);
 	free(record.hash_key);
@@ -71,7 +71,7 @@ void parse_delete(FILE* fp,struct HashTable* CallerTable)
 	printf("------------------------------------------------\n");
 	printf("Delete cdr %s with caller %s\n",cdr_id,caller_num);
 	printf("------------------------------------------------\n\n");
-	TableDelete(CallerTable,caller_num,cdr_id);
+	ht_delete(CallerTable,caller_num,cdr_id);
 	printf("\n");
 	free(cdr_id);
 	free(caller_num);
@@ -87,7 +87,7 @@ void parse_find(FILE* fp,struct HashTable* CallerTable)
 	printf("--------------------------\n");
 	printf("Find Caller:%s\n",caller_num);
 	printf("--------------------------\n\n");
-	TableFind(CallerTable,caller_num,buffer);
+	ht_find(CallerTable,caller_num,buffer);
 	printf("\n");
 
 	free(caller_num);
@@ -104,7 +104,7 @@ void parse_lookup(FILE* fp,struct HashTable* CalleeTable)
 	printf("----------------------------\n");
 	printf("LookUp Callee:%s\n",callee_num);
 	printf("----------------------------\n\n");
-	TableLookUp(CalleeTable,callee_num,buffer);
+	ht_lookup(CalleeTable,callee_num,buffer);
 	printf("\n");
 
 	free(callee_num);
@@ -134,7 +134,7 @@ void parse_topdest(FILE* fp,struct HashTable* CallerTable)
 	printf("----------------------------------\n");
 	printf("Top Destination for %s\n",caller_num);
 	printf("----------------------------------\n\n");
-	TableTopDest(CallerTable,caller_num);
+	ht_topdest(CallerTable,caller_num);
 	printf("\n");
 	free(caller_num);
 }
@@ -146,9 +146,9 @@ void parse_top(FILE* fp,struct HashTable* CallerTable,struct HashTable* CalleeTa
 	printf("----------------------\n");
 	printf("Top %.1f %% subscribers\n",percentage);
 	printf("----------------------\n\n");
-	// PrintHeap(heap);
-	HeapTop(heap,percentage);
-	// PrintHeap(heap);
+	// heap_print(heap);
+	heap_top(heap,percentage);
+	// heap_print(heap);
 	printf("\n");
 }
 
@@ -159,13 +159,13 @@ void parse_bye(FILE* fp,struct HashTable** CallerTable,struct HashTable** Callee
 	printf("New ones will be created automatically\n");
 	printf("--------------------------------------\n\n");
 
-	TableDestroy(*CallerTable);
-	TableDestroy(*CalleeTable);
-	HeapDestroy(*heap);
+	ht_destroy(*CallerTable);
+	ht_destroy(*CalleeTable);
+	heap_destroy(*heap);
 
-	CreateTable(CallerTable,ht1_size,1,bucket_size);
-	CreateTable(CalleeTable,ht2_size,2,bucket_size);
-	HeapCreate(heap);
+	ht_create(CallerTable,ht1_size,1,bucket_size);
+	ht_create(CalleeTable,ht2_size,2,bucket_size);
+	heap_create(heap);
 }
 
 void parse_print(FILE* fp,struct HashTable* CallerTable,struct HashTable* CalleeTable)
@@ -179,8 +179,8 @@ void parse_print(FILE* fp,struct HashTable* CallerTable,struct HashTable* Callee
 	printf("Hashtable %d will be printed\n",tablenumber);
 	printf("---------------------------\n\n");
 
-	if(tablenumber==1)TablePrint(CallerTable);
-	else TablePrint(CalleeTable);
+	if(tablenumber==1)ht_print(CallerTable);
+	else ht_print(CalleeTable);
 	printf("\n");
 	free(tablestring);
 }
@@ -198,8 +198,8 @@ void parse_dump(FILE* fp,struct HashTable* CallerTable,struct HashTable* CalleeT
 	printf("-----------------------------------------\n\n");
 
 
-	if(tablenumber==1)TableDump(CallerTable,dump_file);
-	else TableDump(CalleeTable,dump_file);
+	if(tablenumber==1)ht_dump(CallerTable,dump_file);
+	else ht_dump(CalleeTable,dump_file);
 	printf("\n");
 	free(dump_file);
 	free(tablestring);
@@ -393,19 +393,22 @@ double parse_confile(FILE* fpconfig,int type,int tarrif,int duration)
 	return 0;
 }
 
-void parse_time_range(char* buffer, struct tm* from_date,struct tm* to_date ,int*flag)
+void parse_time_range(char* buffer, struct tm* from_date,struct tm* to_date ,int* flag)
 {
-	/*	0:	no time range provided
-		1:	time1 -> time2
-		2:	year1 -> year2
-		3:	time1,year1  --> time2,year2
-	*/
+
+	/**
+	 * 0:	no time range provided
+	 * 1:	time1 -> time2
+	 * 2:	year1 -> year2
+	 * 3:	time1,year1  --> time2,year2
+	 */
+
+	*flag = 0;
 
 	if(buffer[0]=='\n')
 	{
 		/*Time range was not provided*/
 		printf("No time range\n");
-		*flag=0;
 		return;
 	}
 	from_date->tm_sec = to_date->tm_sec=0;
@@ -433,6 +436,7 @@ void parse_time_range(char* buffer, struct tm* from_date,struct tm* to_date ,int
 			printf(" ---> ");
 			printf("%02d:%02d\n",to_date->tm_hour,to_date->tm_min);
 			*flag=1;
+			free(temp);
 			return;
 		}
 		/*year1 -> year2*/
@@ -448,6 +452,7 @@ void parse_time_range(char* buffer, struct tm* from_date,struct tm* to_date ,int
 			--from_date->tm_mon;
 			--to_date->tm_mon;
 			*flag=2;
+			free(temp);
 			return;
 		}
 	}
@@ -464,8 +469,8 @@ void parse_time_range(char* buffer, struct tm* from_date,struct tm* to_date ,int
 		--from_date->tm_mon;
 		--to_date->tm_mon;
 		*flag=3;
+		free(temp);
 		return;
 	}
 	free(temp);
-
 }

@@ -9,19 +9,19 @@
 
 
 
-void QueueCreate(struct Queue** queue)
+void queue_create(struct Queue** queue)
 {
 
 	*queue=malloc(sizeof(struct Queue));
 	(*queue)->front=(*queue)->rear=NULL;
 }
 
-int QueueIsEmpty(struct Queue* queue)
+int queue_is_empty(struct Queue* queue)
 {
 	return queue->front==NULL;
 }
 
-void Enqueue(struct Queue* queue,struct HeapNode* x)
+void enqueue(struct Queue* queue,struct HeapNode* x)
 {
 
 	struct QueueNode* temp = malloc(sizeof(struct QueueNode));
@@ -39,13 +39,13 @@ void Enqueue(struct Queue* queue,struct HeapNode* x)
 }
 
 
-struct HeapNode* Dequeue(struct Queue* queue)
+struct HeapNode* dequeue(struct Queue* queue)
 {
 	struct QueueNode* temp = queue->front;
 	struct HeapNode* return_value = queue->front->data;
 	if(queue->front == NULL)
 	{
-		fprintf(stderr,"Dequeue: Queue is Empty\n");
+		fprintf(stderr,"dequeue: Queue is Empty\n");
 		return NULL;
 	}
 	if(queue->front == queue->rear)
@@ -60,7 +60,7 @@ struct HeapNode* Dequeue(struct Queue* queue)
 	return return_value;
 }
 
-void QueueDestroy(struct Queue* queue)
+void queue_destroy(struct Queue* queue)
 {
 	struct QueueNode* current;
 	struct QueueNode* temp;
@@ -77,13 +77,13 @@ void QueueDestroy(struct Queue* queue)
 }
 
 
-void Print(struct Queue* queue)
+void queue_print(struct Queue* queue)
 {
-	struct QueueNode* temp = queue->front;
-	while(temp != NULL)
+	struct QueueNode* current = queue->front;
+	while(current != NULL)
 	{
-		printf("%p | ",temp->data);
-		temp = temp->next;
+		printf("%p | ",current->data);
+		current = current->next;
 	}
 	printf("\n");
 }

@@ -68,9 +68,9 @@ int main(int argc,char* argv[])
 	struct HashTable* caller_table;
 	struct HashTable* callee_table;
 	struct Heap* heap;
-	CreateTable(&caller_table,ht1_size,1,bucket_size);
-	CreateTable(&callee_table,ht2_size,2,bucket_size);
-	HeapCreate(&heap);
+	ht_create(&caller_table,ht1_size,1,bucket_size);
+	ht_create(&callee_table,ht2_size,2,bucket_size);
+	heap_create(&heap);
 
 	/* Read Operations File(if provided) */
 	if(opfile!=NULL)
@@ -91,9 +91,9 @@ int main(int argc,char* argv[])
 
 	free(opfile);
 	free(confile);
-	TableDestroy(caller_table);
-	TableDestroy(callee_table);
-	HeapDestroy(heap);
+	ht_destroy(caller_table);
+	ht_destroy(callee_table);
+	heap_destroy(heap);
 	return 0;
 
 }

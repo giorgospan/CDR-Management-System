@@ -15,14 +15,8 @@ INCLUDES := $(wildcard $(INCDIR)/*.h)
 CC       := gcc
 CFLAGS   := -g -I$(INCDIR)
 
-
+# create everything
 all:clean $(BUILDDIR)/$(TARGET)
-
-valgrind:clean $(BUILDDIR)/$(TARGET)
-	valgrind --leak-check=full --track-origins=yes --show-leak-kinds=all $(BUILDDIR)/$(TARGET) -h1 10 -h2 10 -s 1024 -o ./input_files/testinput.txt -c ./input_files/config_file.txt
-
-run:clean $(BUILDDIR)/$(TARGET)
-	$(BUILDDIR)/$(TARGET) -h1 10 -h2 10 -s 1024 -o ./input_files/input11.txt -c ./input_files/config_file.txt
 
 # create executable [by linking object files]
 # $(BUILDDIR) is an order-only-prerequisite
