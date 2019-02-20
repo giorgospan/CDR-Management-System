@@ -4,7 +4,7 @@
 #include <time.h>
 
 
-/*I would use this for indist operation*/
+/*Might use this for indist operation*/
 // struct auxiliary_struct
 // {
 	// int counter;
@@ -36,7 +36,7 @@ struct Time
 {
 	int hours;
 	int minutes;
-	
+
 };
 
 int compare(struct tm ,struct tm,struct tm,int);

@@ -34,7 +34,6 @@ void heap_destroy(struct Heap* heap)
 	free(heap);
 }
 
-
 void heap_add_node(struct Heap* heap,struct HeapNode** new_node,struct HeapNode* parent,char position,char* caller,float charge)
 {
 	(*new_node)         = malloc(sizeof(struct HeapNode));
@@ -116,6 +115,8 @@ void shift_up(struct Heap* heap,struct HeapNode* node)
 
 void shift_down(struct Heap* heap,struct HeapNode* node)
 {
+	if(node==NULL)return;
+
 	float max_val=node->bill;
 	struct HeapNode* max_node=node;
 
@@ -149,8 +150,8 @@ void shift_down(struct Heap* heap,struct HeapNode* node)
 void heap_insert(struct Heap* heap,char* caller,float charge)
 {
 	char position;
-	int found=0;
-	int found_empty=0;
+	int found       = 0;
+	int found_empty = 0;
 	struct HeapNode* parent_of_empty;
 	struct HeapNode* parent;
 	struct HeapNode* new_node;
@@ -173,15 +174,14 @@ void heap_insert(struct Heap* heap,char* caller,float charge)
 		return ;
 	}
 
-	/*BFS until the caller has been found or until the end of Heap*/
+	/*BFS until the caller has been found or until the end of Heap has been reached*/
 	struct Queue* queue;
 	queue_create(&queue);
 	enqueue(queue,heap->root);
 	while(!queue_is_empty(queue))
 	{
-		current=dequeue(queue);
-		parent=current->parent;
-
+		current = dequeue(queue);
+		parent  = current->parent;
 
 		/*If found: Stop search*/
 		if(!strcmp(current->caller,caller))
@@ -195,18 +195,18 @@ void heap_insert(struct Heap* heap,char* caller,float charge)
 		if(current->left != NULL)enqueue(queue,current->left);
 		else if(!found_empty)
 		{
-			new_node=current->left;
-			parent_of_empty=current;
-			position='l';
-			found_empty=1;
+			new_node        = current->left;
+			parent_of_empty = current;
+			position        = 'l';
+			found_empty     = 1;
 		}
 		if(current->right!=NULL)enqueue(queue,current->right);
 		else if(!found_empty)
 		{
-			parent_of_empty=current;
-			new_node=current->right;
-			position='r';
-			found_empty=1;
+			parent_of_empty = current;
+			new_node        = current->right;
+			position        = 'r';
+			found_empty     = 1;
 		}
 	}
 	queue_destroy(queue);
@@ -218,7 +218,6 @@ void heap_insert(struct Heap* heap,char* caller,float charge)
 		heap->revenue+=charge;
 		shift_up(heap,parent);
 	}
-
 	/*Else: Create a new node and shift_up starting from parent of the new node*/
 	else
 	{
@@ -227,11 +226,64 @@ void heap_insert(struct Heap* heap,char* caller,float charge)
 	}
 }
 
-/*O(n) : linear search required to find where the caller is inside the heap */
-void heap_delete(struct Heap* heap,char* caller_num)
+/*O(n) : linear search required in order to find where the caller resides inside the heap */
+void heap_delete(struct Heap* heap,char* caller,float charge)
 {
+	char position;
+	int found       = 0;
+	int found_empty = 0;
+	struct HeapNode* parent_of_empty;
+	struct HeapNode* parent;
+	struct HeapNode* new_node;
+	struct HeapNode* current = heap->root;
 
+	/*If Heap is empty*/
+	if(heap->counter==0)
+		return;
 
+	/*BFS until the caller has been found or until the end of Heap has been reached*/
+	struct Queue* queue;
+	queue_create(&queue);
+	enqueue(queue,heap->root);
+	while(!queue_is_empty(queue))
+	{
+		current=dequeue(queue);
+		parent=current->parent;
+
+		/*If found: Stop search*/
+		if(!strcmp(current->caller,caller))
+		{
+			found=1;
+			break;
+		}
+
+		/*Need to hold the first node found without a child[either left or right]  in case the given caller is not in the heap */
+		if(current->left != NULL)enqueue(queue,current->left);
+		else if(!found_empty)
+		{
+			new_node        = current->left;
+			parent_of_empty = current;
+			found_empty     = 1;
+		}
+		if(current->right!=NULL)enqueue(queue,current->right);
+		else if(!found_empty)
+		{
+			parent_of_empty = current;
+			new_node        = current->right;
+			found_empty     = 1;
+		}
+	}
+	queue_destroy(queue);
+
+	/*If found: Update and start shifting downwards until heap property holds */
+	if(found)
+	{
+		current->bill-=charge;
+		heap->revenue-=charge;
+		shift_down(heap,parent);
+	}
+	else
+		return;
 }
 
 int extract_root(struct Heap* heap,struct aux_struct* return_value)
@@ -296,8 +348,6 @@ void heap_top(struct Heap* heap,float  percentage)
 	/*Keeping starting revenue because im gonna extract some nodes from the heap*/
 	float starting_rev=heap->revenue;
 
-
-
 	/*Empty Heap OR percentage give is zero*/
 	if(percentage==0 || heap->root==NULL)
 	{
@@ -315,7 +365,7 @@ void heap_top(struct Heap* heap,float  percentage)
 
 	/*We should reach total*/
 	float total = heap->revenue*percentage/100;
-	printf("Revenue:%.2f\nTop %.1f %% equals to: %.2f euros\n",heap->revenue,percentage,total);
+	printf("Revenue:%.2f\nTop %.1f %% equals to: %.2f euros\n\n",heap->revenue,percentage,total);
 	float current_sum=0;
 	struct aux_struct* extracted;
 

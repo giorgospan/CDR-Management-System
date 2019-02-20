@@ -47,7 +47,7 @@ void list_insert(struct List*,struct CDR* );
 
 /*Deletes a CDR of a specific caller*/
 /*Returns 1 if caller has been found, else 0*/
-int list_delete(struct List*,char*,char*);
+int list_delete(struct List*,char*,char*,struct CDR* cdr);
 
 /*Finds CDRs of a caller [in a time range optionally]*/
 int list_find(struct List*,char*,char*,int);
@@ -78,13 +78,13 @@ void list_destroy(struct List*);
 
 /*Searches in  a list for a given number. Returns its bucketslot*/
 /*Stops searching upon finding an empty slot or finding the given number*/
-struct NumberBucket* search_number(struct List*,char*);
+struct NumberEntry* search_number(struct List*,char*);
 
 
 
 /*Searches in a list for a given CDR.Returns its bucketslot*/
 /*Stops searching as soon as it finds the given CDR or as soon as it reaches the end of list*/
-struct CDRBucket* search_cdr(struct List* list,char*,struct ListNode**);
+struct CDREntry* search_cdr(struct List* list,char*,struct ListNode**);
 
 
 

@@ -27,7 +27,6 @@ struct Heap
 /*Creates Heap*/
 void heap_create(struct Heap**);
 
-
 /*Destroys the Heap*/
 void heap_destroy(struct Heap*);
 
@@ -38,7 +37,7 @@ void heap_destroy_rec(struct HeapNode*);
 void heap_insert(struct Heap*,char*,float);
 
 /*Deletes an element from the heap*/
-void heap_delete(struct Heap* heap,char* caller_num);
+void heap_delete(struct Heap*,char*,float);
 
 /*Adds a new node */
 void heap_add_node(struct Heap*,struct HeapNode** ,struct HeapNode*,char,char*,float );

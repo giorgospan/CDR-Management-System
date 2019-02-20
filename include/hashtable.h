@@ -7,7 +7,7 @@
 struct HashTable
 {
 	/*Dynamic Table of pointers to struct List*/
-	struct List** table; 
+	struct List** table;
 	int size;
 	int type; /*1 for Caller's | 2 for Callee's*/
 	int records; /*Number of records inserted in the table*/
@@ -18,16 +18,14 @@ struct HashTable
 /*Calls ListCreate for every list of the table*/
 void ht_create(struct HashTable** ,int,int,int);
 
-
 /*Hash Function*/
 int hashfun(struct HashTable* ,char*);
-
 
 /*Inserts a new CDR */
 void ht_insert(struct HashTable*,struct CDR*);
 
 /*Deletes a specific CDR of a given caller*/
-void ht_delete(struct HashTable* ,char*,char*);
+int ht_delete(struct HashTable* ,char*,char*,struct CDR*);
 
 /*Finds CDRs of a caller [in a time range optionally]*/
 void ht_find(struct HashTable*,char*,char* );

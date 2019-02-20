@@ -17,7 +17,7 @@ void parse_prompt(char*,struct HashTable**,struct HashTable**,struct Heap**);
 
 /*Functions for reading each operation*/
 void parse_insert(FILE*,char*,struct HashTable*,struct HashTable*,struct Heap*);
-void parse_delete(FILE*,struct HashTable*,struct Heap*);
+void parse_delete(FILE*,char*,struct HashTable*,struct Heap*);
 void parse_find(FILE*,struct HashTable*);
 void parse_lookup(FILE*,struct HashTable*);
 void parse_indist(FILE*,struct HashTable*,struct HashTable*);

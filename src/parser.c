@@ -45,15 +45,15 @@ void parse_insert(FILE* fp,char* confile,struct HashTable* caller_table,struct H
 			FILE* fpconfig;
 			if(!(fpconfig=fopen(confile,"r")))
 			{
-				printf("Error with opening config file.Exiting...\n");
+				fprintf(stderr,"Error with opening config file.Exiting...\n");
 				exit(EXIT_FAILURE);
 			}
 			charge = parse_confile(fpconfig,record.type,record.tarrif,record.duration);
 			fclose(fpconfig);
 		}
-		/* No configuration file given */
+		/* No configuration file given - Apply standard charge */
 		else
-			charge = 0.1;
+			charge = 0.1*record.duration;
 
 		heap_insert(heap,record.hash_key,charge);
 	}
@@ -67,26 +67,49 @@ void parse_insert(FILE* fp,char* confile,struct HashTable* caller_table,struct H
 	free(record.other_number);
 	free(caller_number);
 	free(callee_number);
-
-
 }
 
-void parse_delete(FILE* fp,struct HashTable* caller_table,struct Heap* heap)
+void parse_delete(FILE* fp,char* confile,struct HashTable* caller_table,struct Heap* heap)
 {
 	char* caller_num = malloc(50 * sizeof(char));
 	char* cdr_id     = malloc(50 * sizeof(char));
+	int found = 0;
+	struct CDR record;
+	float charge;
+
 	/**
 	 * White space is essential for avoiding storing
 	 * newline from previous input when reading from prompt
 	 */
-	fscanf(fp," %49[^;];",cdr_id);
-	fscanf(fp,"%49s",caller_num);
+	fscanf(fp,"%49s %49s",caller_num,cdr_id);
 
 	printf("------------------------------------------------\n");
 	printf("Delete cdr %s with caller %s\n",cdr_id,caller_num);
 	printf("------------------------------------------------\n\n");
-	ht_delete(caller_table,caller_num,cdr_id);
-	// heap_delete(heap,caller_num);
+	found = ht_delete(caller_table,caller_num,cdr_id,&record);
+
+	/* If the given cdr_id with the given caller number has been found */
+	if(found)
+		/*Checking if fault condition of type "2XX" */
+		if(record.fault_condition>=200 && record.fault_condition<=299)
+		{
+			if(confile)
+			{
+				FILE* fpconfig;
+				if(!(fpconfig=fopen(confile,"r")))
+				{
+					fprintf(stderr,"Error with opening config file.Exiting...\n");
+					exit(EXIT_FAILURE);
+				}
+				charge = parse_confile(fpconfig,record.type,record.tarrif,record.duration);
+				fclose(fpconfig);
+			}
+			/* No configuration file given */
+			else
+				charge = 0.1*record.duration;
+			heap_delete(heap,caller_num,charge);
+		}
+
 	printf("\n");
 	free(cdr_id);
 	free(caller_num);
@@ -96,6 +119,7 @@ void parse_find(FILE* fp,struct HashTable* caller_table)
 {
 	char* caller_num = malloc(50 * sizeof(char));
 	char* buffer     = malloc(50 * sizeof(char));
+	strcpy(buffer,"");
 
 	fscanf(fp,"%49s",caller_num);
 	fgets(buffer,49,fp);
@@ -113,9 +137,10 @@ void parse_lookup(FILE* fp,struct HashTable* callee_table)
 {
 	char* callee_num = malloc(50 * sizeof(char));
 	char* buffer     = malloc(50 * sizeof(char));
+	strcpy(buffer,"");
+
 	fscanf(fp,"%49s",callee_num);
 	fgets(buffer,50,fp);
-
 	printf("----------------------------\n");
 	printf("LookUp Callee:%s\n",callee_num);
 	printf("----------------------------\n\n");
@@ -241,7 +266,7 @@ void parse_opfile(FILE* fp,char* confile,struct HashTable** caller_table,struct 
 		}
 		else if(!strcmp(operation,"delete"))
 		{
-			parse_delete(fp,*caller_table,*heap);
+			parse_delete(fp,confile,*caller_table,*heap);
 		}
 		else if(!strcmp(operation,"find"))
 		{
@@ -323,8 +348,8 @@ void parse_prompt(char* confile,struct HashTable** caller_table,struct HashTable
 				for(i=0;i<inserts;++i)parse_insert(stdin,confile,*caller_table,*callee_table,*heap);
 				break;
 			case 2:
-				printf("Enter CDR unique ID and caller's number seperated by semicolon\n");
-				parse_delete(stdin,*caller_table,*heap);
+				printf("Enter caller's number and CDR unique ID seperated by whitespace\n");
+				parse_delete(stdin,confile,*caller_table,*heap);
 				break;
 			case 3:
 				printf("Enter caller's number and time range [optionally]\n");
@@ -373,7 +398,7 @@ double parse_confile(FILE* fpconfig,int type,int tarrif,int duration)
 	float cost;
 
 	/*SMS: standard charge*/
-	if(type==0 && tarrif==0)return 0.1;
+	if(type==0 && tarrif==0)return 0.1*duration;
 
 	/*Otherwise*/
 	char* line = malloc(200*sizeof(char));
@@ -392,8 +417,9 @@ double parse_confile(FILE* fpconfig,int type,int tarrif,int duration)
 		}
 	}
 	free(line);
-	/* (Type,Tarrif) combination was not found*/
-	return 0;
+	/* (Type,Tarrif) combination was not found */
+	/* Thus, return standard charge */
+	return 0.1*duration;
 }
 
 void parse_time_range(char* buffer, struct tm* from_date,struct tm* to_date ,int* flag)
@@ -407,8 +433,7 @@ void parse_time_range(char* buffer, struct tm* from_date,struct tm* to_date ,int
 	 */
 
 	*flag = 0;
-
-	if(buffer[0]=='\n')
+	if(!strcmp(buffer,"\n") || !strcmp(buffer,""))
 	{
 		/*Time range was not provided*/
 		printf("No time range\n");

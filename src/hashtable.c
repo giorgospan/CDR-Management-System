@@ -49,7 +49,6 @@ void ht_insert(struct HashTable* ht,struct CDR* cdr)
 	int hashval;
 	char* number;
 
-
 	number  = malloc((strlen(cdr->hash_key)+1)*sizeof(char));
 	strcpy(number,cdr->hash_key);
 	hashval = hashfun(ht,number);
@@ -59,20 +58,25 @@ void ht_insert(struct HashTable* ht,struct CDR* cdr)
 	++ht->records;
 }
 
-void ht_delete(struct HashTable* ht,char* caller,char* cdr_id)
+int ht_delete(struct HashTable* ht,char* caller,char* cdr_id,struct CDR* cdr)
 {
 	int hashval;
 	int deleted = 0;
 
 	hashval = hashfun(ht,caller);
-	deleted = list_delete(ht->table[hashval],caller,cdr_id);
+	deleted = list_delete(ht->table[hashval],caller,cdr_id,cdr);
 
 	if(deleted)
 	{
 		printf("Deleted %s\n",cdr_id);
 		--ht->records;
+		return 1;
 	}
-	else printf("DError\n");
+	else
+	{
+		printf("CDR %s with caller %s was not found\n",cdr_id,caller);
+		return 0;
+	}
 }
 
 void ht_find(struct HashTable* ht,char* caller,char* time_range)
@@ -153,8 +157,6 @@ void ht_destroy(struct HashTable* ht)
 	free(ht->table);
 	free(ht);
 }
-
-
 
 // void TableIndist(struct HashTable* ht,char* caller1,char* caller2)
 // {

@@ -17,9 +17,9 @@ void bucket_create(void** bucket,int type,int slots)
 	/*Create bucket of the first type [Number bucket]*/
 	if(type==1)
 	{
-		*bucket = malloc(slots * sizeof(struct NumberBucket));
+		*bucket = malloc(slots * sizeof(struct NumberEntry));
 
-		struct NumberBucket* ptr = *bucket;
+		struct NumberEntry* ptr = *bucket;
 		for(i=0;i<slots;++i)
 		{
 			ptr[i].hash_key=NULL;
@@ -31,9 +31,9 @@ void bucket_create(void** bucket,int type,int slots)
 	/*Create bucket of the second type [CDR bucket]*/
 	else
 	{
-		*bucket = malloc(slots * sizeof(struct CDRBucket));
+		*bucket = malloc(slots * sizeof(struct CDREntry));
 
-		struct CDRBucket* ptr = *bucket;
+		struct CDREntry* ptr = *bucket;
 		for(i=0;i<slots;++i)
 		{
 			ptr[i].cdr_uniq_id  = NULL;
@@ -49,7 +49,7 @@ void bucket_destroy(void* bucket,int buckettype,int slots)
 	/*Destroy bucket of the first buckettype [Number bucket]*/
 	if(buckettype==1)
 	{
-		struct NumberBucket* ptr = bucket;
+		struct NumberEntry* ptr = bucket;
 		for(i=0;i<slots;++i)
 		{
 			if(ptr[i].hash_key)free(ptr[i].hash_key);
@@ -60,7 +60,7 @@ void bucket_destroy(void* bucket,int buckettype,int slots)
 	/*Destroy bucket of the second buckettype [CDR bucket]*/
 	else
 	{
-		struct CDRBucket* ptr = bucket;
+		struct CDREntry* ptr = bucket;
 		for(i=0;i<slots;++i)
 		{
 			if(ptr[i].cdr_uniq_id)
@@ -77,7 +77,7 @@ void bucket_destroy(void* bucket,int buckettype,int slots)
 /*tabletype is needed in order to know which number to print first.*/
 /*if it's 1 , then print first hash_key  [CallerTalbe]*/
 /*if it's 2 , then print first the other_number [CalleeTalbe]*/
-int cdr_print(struct CDRBucket* bucket,char* hash_key,struct tm from_date,struct tm to_date,int flag,int slots,int tabletype)
+int cdr_print(struct CDREntry* bucket,char* hash_key,struct tm from_date,struct tm to_date,int flag,int slots,int tabletype)
 {
 	int found_cdr=0;
 	int i;
@@ -112,10 +112,10 @@ int cdr_print(struct CDRBucket* bucket,char* hash_key,struct tm from_date,struct
 	return found_cdr;
 }
 
-void cdrbucket_print(struct CDRBucket* bucket,char* hash_key,int slots,int tabletype)
+void cdrbucket_print(struct CDREntry* bucket,char* hash_key,int slots,int tabletype)
 {
 	int i;
-	struct CDRBucket* ptr=bucket;
+	struct CDREntry* ptr=bucket;
 	for(i=0;i<slots;++i)
 	{
 		/*Check if bucketslot is empty*/
@@ -146,7 +146,7 @@ void cdrbucket_print(struct CDRBucket* bucket,char* hash_key,int slots,int table
 void cdrbucket_dump(void* bucket,int tabletype,int slots,FILE* fp,char* hash_key)
 {
 	int i;
-	struct CDRBucket* ptr=bucket;
+	struct CDREntry* ptr=bucket;
 	for(i=0;i<slots;++i)
 	{
 		if(ptr[i].cdr_uniq_id)
@@ -172,7 +172,7 @@ void cdrbucket_dump(void* bucket,int tabletype,int slots,FILE* fp,char* hash_key
 	}
 }
 
-int bucket_is_empty(struct CDRBucket* bucket,int slots)
+int bucket_is_empty(struct CDREntry* bucket,int slots)
 {
 	int i;
 	/*Scan every Slot until you find a filled one*/
@@ -184,14 +184,14 @@ int bucket_is_empty(struct CDRBucket* bucket,int slots)
 }
 
 
-void number_copy(struct NumberBucket* bucket,char* number)
+void number_copy(struct NumberEntry* bucket,char* number)
 {
 	bucket->hash_key= malloc((strlen(number)+1)*sizeof(char));
 	strcpy(bucket->hash_key,number);
 
 }
 
-void cdr_copy(struct CDRBucket* bucket,struct CDR* cdr)
+void cdr_copy(struct CDREntry* bucket,struct CDR* cdr)
 {
 	bucket->cdr_uniq_id = malloc((strlen(cdr->cdr_uniq_id)+1)*sizeof(char));
 	strcpy(bucket->cdr_uniq_id,cdr->cdr_uniq_id);

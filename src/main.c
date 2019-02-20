@@ -4,7 +4,7 @@
 
 
 #include "hashtable.h"
-#include "bucket.h"/*for sizeof(struct CDRBucket)*/
+#include "bucket.h"/*for sizeof(struct CDREntry)*/
 #include "heap.h"
 #include "parser.h"
 
@@ -51,7 +51,7 @@ int main(int argc,char* argv[])
 		else if(!strcmp("-s",argv[i]))
 		{
 			bucket_size = atoi(argv[i+1]);
-			if (bucket_size<=sizeof(struct CDRBucket)) {
+			if (bucket_size<=sizeof(struct CDREntry)) {
 				fprintf(stderr, "Error: Bucket size is too small\n");
 				exit(EXIT_FAILURE);
 			}
