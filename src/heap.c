@@ -34,16 +34,17 @@ void heap_destroy(struct Heap* heap)
 	free(heap);
 }
 
+
 void heap_add_node(struct Heap* heap,struct HeapNode** new_node,struct HeapNode* parent,char position,char* caller,float charge)
 {
-	(*new_node)=malloc(sizeof(struct HeapNode));
-	(*new_node)->bill=charge;
-	(*new_node)->caller=malloc((strlen(caller)+1)*sizeof(char));
+	(*new_node)         = malloc(sizeof(struct HeapNode));
+	(*new_node)->bill   = charge;
+	(*new_node)->caller = malloc((strlen(caller)+1)*sizeof(char));
 	strcpy((*new_node)->caller,caller);
 
 
-	(*new_node)->parent=parent;
-	(*new_node)->left=(*new_node)->right=NULL;
+	(*new_node)->parent = parent;
+	(*new_node)->left   = (*new_node)->right=NULL;
 
 	/*position indicates where to attach the (*new_node) [right or left of the parent]*/
 	if(position=='l')parent->left=(*new_node);
@@ -190,7 +191,7 @@ void heap_insert(struct Heap* heap,char* caller,float charge)
 		}
 
 		/*Need to hold the first node found without a child[either left or right]  in case the given caller is not in the heap */
-		/*Otherwise,i will just update the given caller*/
+		/*Otherwise,I will just update the given caller*/
 		if(current->left != NULL)enqueue(queue,current->left);
 		else if(!found_empty)
 		{
@@ -226,6 +227,13 @@ void heap_insert(struct Heap* heap,char* caller,float charge)
 	}
 }
 
+/*O(n) : linear search required to find where the caller is inside the heap */
+void heap_delete(struct Heap* heap,char* caller_num)
+{
+
+
+}
+
 int extract_root(struct Heap* heap,struct aux_struct* return_value)
 {
 	/*Heap is empty*/
@@ -241,7 +249,7 @@ int extract_root(struct Heap* heap,struct aux_struct* return_value)
 	/*Heap with at least two nodes*/
 	if(heap->counter>1)
 	{
-		/*BFS in order to find last node in heap*/
+		/*BFS in order to find last node in the heap*/
 		struct HeapNode* current;
 		struct HeapNode* last_node;
 		struct HeapNode* parent_of_last_node;

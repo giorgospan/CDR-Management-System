@@ -8,7 +8,7 @@
 #include "hashtable.h"
 #include "heap.h"
 
-void parse_insert(FILE* fp,FILE* fpconfig,struct HashTable* CallerTable,struct HashTable* CalleeTable,struct Heap* heap)
+void parse_insert(FILE* fp,char* confile,struct HashTable* caller_table,struct HashTable* callee_table,struct Heap* heap)
 {
 	double charge;
 	struct CDR record;
@@ -35,18 +35,32 @@ void parse_insert(FILE* fp,FILE* fpconfig,struct HashTable* CallerTable,struct H
 
 	strcpy(record.hash_key,caller_number);
 	strcpy(record.other_number,callee_number);
-	ht_insert(CallerTable,&record);
+	ht_insert(caller_table,&record);
 
 	/*Checking if fault condition of type "2XX" */
 	if(record.fault_condition>=200 && record.fault_condition<=299)
 	{
-		charge=parse_confile(fpconfig,record.type,record.tarrif,record.duration);
+		if(confile)
+		{
+			FILE* fpconfig;
+			if(!(fpconfig=fopen(confile,"r")))
+			{
+				printf("Error with opening config file.Exiting...\n");
+				exit(EXIT_FAILURE);
+			}
+			charge = parse_confile(fpconfig,record.type,record.tarrif,record.duration);
+			fclose(fpconfig);
+		}
+		/* No configuration file given */
+		else
+			charge = 0.1;
+
 		heap_insert(heap,record.hash_key,charge);
 	}
 
 	strcpy(record.hash_key,callee_number);
 	strcpy(record.other_number,caller_number);
-	ht_insert(CalleeTable,&record);
+	ht_insert(callee_table,&record);
 
 	free(record.cdr_uniq_id);
 	free(record.hash_key);
@@ -57,7 +71,7 @@ void parse_insert(FILE* fp,FILE* fpconfig,struct HashTable* CallerTable,struct H
 
 }
 
-void parse_delete(FILE* fp,struct HashTable* CallerTable)
+void parse_delete(FILE* fp,struct HashTable* caller_table,struct Heap* heap)
 {
 	char* caller_num = malloc(50 * sizeof(char));
 	char* cdr_id     = malloc(50 * sizeof(char));
@@ -71,13 +85,14 @@ void parse_delete(FILE* fp,struct HashTable* CallerTable)
 	printf("------------------------------------------------\n");
 	printf("Delete cdr %s with caller %s\n",cdr_id,caller_num);
 	printf("------------------------------------------------\n\n");
-	ht_delete(CallerTable,caller_num,cdr_id);
+	ht_delete(caller_table,caller_num,cdr_id);
+	// heap_delete(heap,caller_num);
 	printf("\n");
 	free(cdr_id);
 	free(caller_num);
 }
 
-void parse_find(FILE* fp,struct HashTable* CallerTable)
+void parse_find(FILE* fp,struct HashTable* caller_table)
 {
 	char* caller_num = malloc(50 * sizeof(char));
 	char* buffer     = malloc(50 * sizeof(char));
@@ -87,14 +102,14 @@ void parse_find(FILE* fp,struct HashTable* CallerTable)
 	printf("--------------------------\n");
 	printf("Find Caller:%s\n",caller_num);
 	printf("--------------------------\n\n");
-	ht_find(CallerTable,caller_num,buffer);
+	ht_find(caller_table,caller_num,buffer);
 	printf("\n");
 
 	free(caller_num);
 	free(buffer);
 }
 
-void parse_lookup(FILE* fp,struct HashTable* CalleeTable)
+void parse_lookup(FILE* fp,struct HashTable* callee_table)
 {
 	char* callee_num = malloc(50 * sizeof(char));
 	char* buffer     = malloc(50 * sizeof(char));
@@ -104,14 +119,14 @@ void parse_lookup(FILE* fp,struct HashTable* CalleeTable)
 	printf("----------------------------\n");
 	printf("LookUp Callee:%s\n",callee_num);
 	printf("----------------------------\n\n");
-	ht_lookup(CalleeTable,callee_num,buffer);
+	ht_lookup(callee_table,callee_num,buffer);
 	printf("\n");
 
 	free(callee_num);
 	free(buffer);
 }
 
-void parse_indist(FILE* fp,struct HashTable* CallerTable,struct HashTable* CalleeTable)
+void parse_indist(FILE* fp,struct HashTable* caller_table,struct HashTable* callee_table)
 {
 	char* caller1 = malloc(50 * sizeof(char));
 	char* caller2 = malloc(50 * sizeof(char));
@@ -122,25 +137,25 @@ void parse_indist(FILE* fp,struct HashTable* CallerTable,struct HashTable* Calle
 	printf("------------------------------------------------------------------\n\n");
 
 	/* Not implemented */
-	//TableIndist(CallerTable,caller1,caller2);
+	//TableIndist(caller_table,caller1,caller2);
 
 	free(caller1);
 	free(caller2);
 }
 
-void parse_topdest(FILE* fp,struct HashTable* CallerTable)
+void parse_topdest(FILE* fp,struct HashTable* caller_table)
 {
 	char* caller_num = malloc(50 * sizeof(char));
 	fscanf(fp,"%49s",caller_num);
 	printf("----------------------------------\n");
 	printf("Top Destination for %s\n",caller_num);
 	printf("----------------------------------\n\n");
-	ht_topdest(CallerTable,caller_num);
+	ht_topdest(caller_table,caller_num);
 	printf("\n");
 	free(caller_num);
 }
 
-void parse_top(FILE* fp,struct HashTable* CallerTable,struct HashTable* CalleeTable,struct Heap* heap)
+void parse_top(FILE* fp,struct HashTable* caller_table,struct HashTable* callee_table,struct Heap* heap)
 {
 	float percentage;
 	fscanf(fp,"%f",&percentage);
@@ -153,23 +168,23 @@ void parse_top(FILE* fp,struct HashTable* CallerTable,struct HashTable* CalleeTa
 	printf("\n");
 }
 
-void parse_bye(FILE* fp,struct HashTable** CallerTable,struct HashTable** CalleeTable,struct Heap** heap)
+void parse_bye(FILE* fp,struct HashTable** caller_table,struct HashTable** callee_table,struct Heap** heap)
 {
 	printf("--------------------------------------\n");
 	printf("All data structures will be destroyed\n");
 	printf("New ones will be created automatically\n");
 	printf("--------------------------------------\n\n");
 
-	ht_destroy(*CallerTable);
-	ht_destroy(*CalleeTable);
+	ht_destroy(*caller_table);
+	ht_destroy(*callee_table);
 	heap_destroy(*heap);
 
-	ht_create(CallerTable,ht1_size,1,bucket_size);
-	ht_create(CalleeTable,ht2_size,2,bucket_size);
+	ht_create(caller_table,ht1_size,1,bucket_size);
+	ht_create(callee_table,ht2_size,2,bucket_size);
 	heap_create(heap);
 }
 
-void parse_print(FILE* fp,struct HashTable* CallerTable,struct HashTable* CalleeTable)
+void parse_print(FILE* fp,struct HashTable* caller_table,struct HashTable* callee_table)
 {
 	char* tablestring = malloc(50 * sizeof(char));
 	int tablenumber;
@@ -180,13 +195,13 @@ void parse_print(FILE* fp,struct HashTable* CallerTable,struct HashTable* Callee
 	printf("Hashtable %d will be printed\n",tablenumber);
 	printf("---------------------------\n\n");
 
-	if(tablenumber==1)ht_print(CallerTable);
-	else ht_print(CalleeTable);
+	if(tablenumber==1)ht_print(caller_table);
+	else ht_print(callee_table);
 	printf("\n");
 	free(tablestring);
 }
 
-void parse_dump(FILE* fp,struct HashTable* CallerTable,struct HashTable* CalleeTable)
+void parse_dump(FILE* fp,struct HashTable* caller_table,struct HashTable* callee_table)
 {
 	int tablenumber;
 	char* tablestring = malloc(50 * sizeof(char));
@@ -200,14 +215,14 @@ void parse_dump(FILE* fp,struct HashTable* CallerTable,struct HashTable* CalleeT
 	printf("-----------------------------------------\n\n");
 
 
-	if(tablenumber==1)ht_dump(CallerTable,dump_file);
-	else ht_dump(CalleeTable,dump_file);
+	if(tablenumber==1)ht_dump(caller_table,dump_file);
+	else ht_dump(callee_table,dump_file);
 	printf("\n");
 	free(dump_file);
 	free(tablestring);
 }
 
-void parse_opfile(FILE* fp,char* confile,struct HashTable** CallerTable,struct HashTable** CalleeTable,struct Heap** heap)
+void parse_opfile(FILE* fp,char* confile,struct HashTable** caller_table,struct HashTable** callee_table,struct Heap** heap)
 {
 
 
@@ -222,51 +237,43 @@ void parse_opfile(FILE* fp,char* confile,struct HashTable** CallerTable,struct H
 
 		if(!strcmp(operation,"insert"))
 		{
-			FILE* fpconfig;
-			if(!(fpconfig=fopen(confile,"r")))
-			{
-				printf("Error with opening config file.Exiting...\n");
-				exit(EXIT_FAILURE);
-			}
-			parse_insert(fp,fpconfig,*CallerTable,*CalleeTable,*heap);
-			fclose(fpconfig);
+			parse_insert(fp,confile,*caller_table,*callee_table,*heap);
 		}
 		else if(!strcmp(operation,"delete"))
 		{
-			parse_delete(fp,*CallerTable);
+			parse_delete(fp,*caller_table,*heap);
 		}
 		else if(!strcmp(operation,"find"))
 		{
-			parse_find(fp,*CallerTable);
+			parse_find(fp,*caller_table);
 		}
 		else if(!strcmp(operation,"lookup"))
 		{
-			parse_lookup(fp,*CalleeTable);
+			parse_lookup(fp,*callee_table);
 		}
-
 		else if(!strcmp(operation,"indist"))
 		{
-			parse_indist(fp,*CallerTable,*CalleeTable);
+			parse_indist(fp,*caller_table,*callee_table);
 		}
 		else if(!strcmp(operation,"topdest"))
 		{
-			parse_topdest(fp,*CallerTable);
+			parse_topdest(fp,*caller_table);
 		}
 		else if(!strcmp(operation,"top"))
 		{
-			parse_top(fp,*CallerTable,*CalleeTable,*heap);
+			parse_top(fp,*caller_table,*callee_table,*heap);
 		}
 		else if(!strcmp(operation,"bye"))
 		{
-			parse_bye(fp,CallerTable,CalleeTable,heap);
+			parse_bye(fp,caller_table,callee_table,heap);
 		}
 		else if(!strcmp(operation,"print"))
 		{
-			parse_print(fp,*CallerTable,*CalleeTable);
+			parse_print(fp,*caller_table,*callee_table);
 		}
 		else if(!strcmp(operation,"dump"))
 		{
-			parse_dump(fp,*CallerTable,*CalleeTable);
+			parse_dump(fp,*caller_table,*callee_table);
 		}
 		else
 		{
@@ -277,7 +284,7 @@ void parse_opfile(FILE* fp,char* confile,struct HashTable** CallerTable,struct H
 	free(operation);
 }
 
-void parse_prompt(char* confile,struct HashTable** CallerTable,struct HashTable** CalleeTable,struct Heap** heap)
+void parse_prompt(char* confile,struct HashTable** caller_table,struct HashTable** callee_table,struct Heap** heap)
 {
 	char trash[200];
 	int i;
@@ -310,51 +317,45 @@ void parse_prompt(char* confile,struct HashTable** CallerTable,struct HashTable*
 				printf("Exiting...See ya !\n\n\n");
 				break;
 			case 1:
-				if(!(fpconfig=fopen(confile,"r")))
-				{
-					printf("Error with opening config file.Exiting...\n");
-					exit(EXIT_FAILURE);
-				}
 				printf("Enter the number of CDRs you would like to insert\n");
 				scanf("%d",&inserts);
 				printf("Enter CDR_unique_ID;caller_num;callee_num;date;time;duration;type;tarrif;fault_cond\n");
-				for(i=0;i<inserts;++i)parse_insert(stdin,fpconfig,*CallerTable,*CalleeTable,*heap);
-				fclose(fpconfig);
+				for(i=0;i<inserts;++i)parse_insert(stdin,confile,*caller_table,*callee_table,*heap);
 				break;
 			case 2:
 				printf("Enter CDR unique ID and caller's number seperated by semicolon\n");
-				parse_delete(stdin,*CallerTable);
+				parse_delete(stdin,*caller_table,*heap);
 				break;
 			case 3:
 				printf("Enter caller's number and time range [optionally]\n");
-				parse_find(stdin,*CallerTable);
+				parse_find(stdin,*caller_table);
 				break;
 			case 4:
 				printf("Enter callee's number and time range [optionally]\n");
-				parse_find(stdin,*CalleeTable);
+				parse_find(stdin,*callee_table);
 				break;
 			case 5:
 				printf("Enter number for caller1 and caller2\n");
-				parse_indist(stdin,*CallerTable,*CalleeTable);
+				parse_indist(stdin,*caller_table,*callee_table);
 				break;
 			case 6:
 				printf("Enter caller's number\n");
-				parse_topdest(stdin,*CallerTable);
+				parse_topdest(stdin,*caller_table);
 				break;
 			case 7:
 				printf("Enter percentage (%%)\n");
-				parse_top(stdin,*CallerTable,*CalleeTable,*heap);
+				parse_top(stdin,*caller_table,*callee_table,*heap);
 				break;
 			case 8:
-				parse_bye(stdin,CallerTable,CalleeTable,heap);
+				parse_bye(stdin,caller_table,callee_table,heap);
 				break;
 			case 9:
 				printf("Enter \"hashtableX\" [X = 1 or 2]\n");
-				parse_print(stdin,*CallerTable,*CalleeTable);
+				parse_print(stdin,*caller_table,*callee_table);
 				break;
 			case 10:
 				printf("Enter \"hashtableX\" [X = 1 or 2]  and filename\n");
-				parse_dump(stdin,*CallerTable,*CalleeTable);
+				parse_dump(stdin,*caller_table,*callee_table);
 				break;
 			default:
 				printf(">>>Error: Your choice was not valid.Try again<<<\n\n");

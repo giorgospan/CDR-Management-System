@@ -34,8 +34,11 @@ void heap_destroy(struct Heap*);
 /*Destroys recursively each node*/
 void heap_destroy_rec(struct HeapNode*);
 
-/*Inserting a  new element into the heap*/
+/*Inserts a  new element into the heap*/
 void heap_insert(struct Heap*,char*,float);
+
+/*Deletes an element from the heap*/
+void heap_delete(struct Heap* heap,char* caller_num);
 
 /*Adds a new node */
 void heap_add_node(struct Heap*,struct HeapNode** ,struct HeapNode*,char,char*,float );
@@ -43,10 +46,10 @@ void heap_add_node(struct Heap*,struct HeapNode** ,struct HeapNode*,char,char*,f
 /*Extracts Root's value*/
 int extract_root(struct Heap* heap,struct aux_struct*);
 
-/*Shifts up elements until the heap property is satisfied*/
+/*Shifts up element until the heap property is satisfied*/
 void shift_up(struct Heap*,struct HeapNode*);
 
-/*Shifts down elements until the heap property is satisfied*/
+/*Shifts down element until the heap property is satisfied*/
 void shift_down(struct Heap* heap,struct HeapNode* node);
 
 /*Prints Heap nodes using BFS*/

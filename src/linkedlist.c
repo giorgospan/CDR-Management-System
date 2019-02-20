@@ -371,8 +371,8 @@ struct CDRBucket* search_cdr(struct List* list,char* id,struct ListNode** previo
 			bucket=(struct CDRBucket*)(current->bucket);
 			/*If CDRSlot is not empty*/
 			if(bucket[i].cdr_uniq_id)
-			/*Return bucketslot where this cdr was found*/
-			if(!strcmp(bucket[i].cdr_uniq_id,id))return &bucket[i];
+				/*Return bucketslot where this cdr was found*/
+				if(!strcmp(bucket[i].cdr_uniq_id,id))return &bucket[i];
 		}
 		current=current->next;
 	}
