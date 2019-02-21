@@ -16,57 +16,57 @@ The main objective of this project is to implement a variety of data structures 
 
 Images below illustrate the basic structures this application is implemented with :
 
-[Image Not Found](./img/hashtables.png)
+![Image Not Found](./img/hashtables.png)
 
-[Image Not Found](./img/heap.png)
+![Image Not Found](./img/heap.png)
 
 ### Operations
 
  * **insert cdr-record**
 
-  inserts a CDR into the warehouse
+   inserts a CDR into the warehouse
 
  * **delete caller cdr-id**
 
-  deletes the record with id as <cdr-id\> and caller number as <caller\>
+   deletes the record with id as <cdr-id\> and caller number as <caller\>
 
  * **find caller [time1][date1] [time2][date2]**
 
-  shows all the records of a caller (time/date interval is optional\)
+   shows all the records of a caller (time/date interval is optional\)
 
-  time format: HH:MM
+   time format: HH:MM
 
-  date format: DDMMYYYY
+   date format: DDMMYYYY
 
-  Note that if [time1\] is provided, [time2\] must also be present. The same applies for the dates.
+   Note that if [time1\] is provided, [time2\] must also be present. The same applies for the dates.
 
  * **lookup callee [time1][year1] [time2][year2]**
 
-  shows all the calls the given callee has received (time/date interval is optional\)
+   shows all the calls the given callee has received (time/date interval is optional\)
 
  * **topdest caller**
 
-  finds the top call destination for the given caller;that is, the number that the given caller has called most
+   finds the top call destination for the given caller;that is, the number that the given caller has called most
 
  * **top k**
 
-  finds the subscriber numbers that comprise the top-k% of the company's revenue
+   finds the subscriber numbers that comprise the top-k% of the company's revenue
 
  * **bye**
 
-  warehouse application terminates
+   warehouse application terminates
 
-  Memory allocated for the data structures is freed. Subsequently, new empty structures are created.
+   Memory allocated for the data structures is freed. Subsequently, new empty structures are created.
 
  * **print hashttableX**
 
-  prints hash-table's X content [X:1 for callers' table , X:2 for callees'\]
+   prints hash-table's X content [X:1 for callers' table , X:2 for callees'\]
 
 
 ## Usage
 
   1. `make`
-  2. `./werhauz -o operations-file -h1 Hashtable1NumOfEntries -h2 Hashtable2NumOfEntries -s bucket_size -c config-file`
+  2. `./build/werhauz -o operations-file -h1 Hashtable1NumOfEntries -h2 Hashtable2NumOfEntries -s bucket_size -c config-file`
 
 * operations-file: input file containing the operation to be applied on the structures (insert,delete,find e.t.c). Such operations can be inserted manually too via the prompt.
 
@@ -80,5 +80,5 @@ Images below illustrate the basic structures this application is implemented wit
 
  *Options can be given in any order.*
 
- *You may use the run.sh script if it suits you better*
+ *You may use the [run.sh](./run.sh) script if it suits you better.*
 
