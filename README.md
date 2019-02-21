@@ -6,6 +6,28 @@ The main objective of this project is to implement a variety of data structures 
 
 ## Implementation
 
+### CDR format
+
+Each CDR is an ASCII line consisting of the following parts:
+
+1. **cdr-uniq-id** : unique identifier for each record containing only capital letters and numbers
+
+2. **originator-number** : calling number consisting of a 3-digit country code and a 10-digit telephone number (e.g. 357-2127272314\)
+
+3. **destination-number** : called number with the same format as the originator one
+
+4. **date** : call's date with DDMMYYYY format
+
+5. **init-time** : call's starting time with HH:MM format
+
+6. **duration** : call's duration in minutes
+
+7. **type** : call's type (e.g. voice call,SMS,e.t.c\)
+
+8. **tarrif** : charging rate for this call
+
+9. **fault-condition** : an integer number that describes if an error occurred during the call
+
 ### Data structures
 
   * Two hash-tables using bucket chains, one for the callers and one for the callees. The key given to the hash function is the caller number and the callee number respectively. Buckets are allocated dynamically, thus creating a linked list.
@@ -20,17 +42,21 @@ Images below illustrate the basic structures this application is implemented wit
 
 ![Image Not Found](./img/heap.png)
 
+
+
 ### Operations
 
- * **insert cdr-record**
+ * `insert <cdr-record>`
 
    inserts a CDR into the warehouse
 
- * **delete caller cdr-id**
+   CDR format: `cdr-uniq-id;originator-number;destination-number;date;init-time;duration;type;tarrif;fault-condition`
+
+ * `delete <caller> <cdr-id>`
 
    deletes the record with id as <cdr-id\> and caller number as <caller\>
 
- * **find caller [time1][date1] [time2][date2]**
+ * `find <caller> [time1][date1] [time2][date2]`
 
    shows all the records of a caller (time/date interval is optional\)
 
@@ -40,25 +66,25 @@ Images below illustrate the basic structures this application is implemented wit
 
    Note that if [time1\] is provided, [time2\] must also be present. The same applies for the dates.
 
- * **lookup callee [time1][year1] [time2][year2]**
+ * `lookup <callee> [time1][year1] [time2][year2]`
 
    shows all the calls the given callee has received (time/date interval is optional\)
 
- * **topdest caller**
+ * `topdest <caller>`
 
    finds the top call destination for the given caller;that is, the number that the given caller has called most
 
- * **top k**
+ * `top <k>`
 
    finds the subscriber numbers that comprise the top-k% of the company's revenue
 
- * **bye**
+ * `bye`
 
    warehouse application terminates
 
    Memory allocated for the data structures is freed. Subsequently, new empty structures are created.
 
- * **print hashttableX**
+ * `print <hashttableX>`
 
    prints hash-table's X content [X:1 for callers' table , X:2 for callees'\]
 
