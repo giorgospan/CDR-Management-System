@@ -94,15 +94,15 @@ Images below illustrate the basic structures this application is implemented wit
   1. `make`
   2. `./build/werhauz -o operations-file -h1 Hashtable1NumOfEntries -h2 Hashtable2NumOfEntries -s bucket_size -c config-file`
 
-* operations-file: input file containing the operation to be applied on the structures (insert,delete,find e.t.c). Such operations can be inserted manually too via the prompt.
+* `operations-file`: input file containing the operation to be applied on the structures (insert,delete,find e.t.c). Such operations can be inserted manually too via the prompt.
 
-* Hashtable1NumOfEntries: number of entries for callers' hashtable
+* `Hashtable1NumOfEntries`: number of entries for callers' hashtable
 
-* Hashtable2NumOfEntries: number of entries for callees' hashtable
+* `Hashtable2NumOfEntries`: number of entries for callees' hashtable
 
-* bucket_size: bucket size in bytes
+* `bucket_size`: bucket size in bytes
 
-* config-file: optional file used for configuring the application. You can see an explanation [here](./input_files/explanation.txt)
+* `config-file`: optional file used for configuring the application. You can see an explanation [here](./input_files/explanation.txt)
 
  *Options can be given in any order.*
 
